@@ -98,22 +98,22 @@ def start_bot():
 
         if call.data == 'buy':
             try:
-                 print(34)
-                 product = product_dict[chat_id]
+                print(34)
+                product = product_dict[chat_id]
 
-                 code = random.randint(111, 999)
-                 product.code = code
+                code = random.randint(111, 999)
+                product.code = code
 
-                 msg = bot.send_message(chat_id=chat_id,
-                                        text=f'❕ Вы выбрали - {product.name}\n'
-                                             f'❕ Цена - {float(product.price)} руб\n'
-                                         f'👉 Для подтверждения покупки отправьте {code}')
-                 bot.register_next_step_handler(msg, buy_2)
+                msg = bot.send_message(chat_id=chat_id,
+                                       text=f'❕ Вы выбрали - {product.name}\n'
+                                            f'❕ Цена - {float(product.price)} руб\n'
+                                            f'👉 Для подтверждения покупки отправьте {code}')
+                bot.register_next_step_handler(msg, buy_2)
 
             except:
                 bot.send_message(chat_id=chat_id,
-                                  text='⚠️ Что-то пошло не по плану',
-                                  reply_markup=menu.main_menu)
+                                 text='⚠️ Что-то пошло не по плану',
+                                 reply_markup=menu.main_menu)
 
         if call.data == 'info':
             bot.edit_message_text(

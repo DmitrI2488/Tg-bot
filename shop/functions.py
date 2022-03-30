@@ -193,10 +193,8 @@ def del_product_to_section(name_product, section):
 
     # del
     product = cursor.execute(f'SELECT * FROM "{section}" WHERE list = "{name_product}"').fetchone()
-
     cursor.execute(f"DELETE FROM '{section}' WHERE list = '{name_product}'")
     conn.commit()
-
     cursor.execute(f"DROP TABLE '{product[2]}'")
 
     # Close connection
@@ -230,7 +228,7 @@ def basket(user_id):
     text = ''
 
     for i in row:
-        text = text + '💠 ' + i[2][:10:] + ' | ' + i[1] + '\n\n'
+        text = text + '💠 ' + i[2][:10:] + ' | ' + i[3] + '\n\n'
 
     return text
 
@@ -366,7 +364,7 @@ def buy(dict):
     print(32)
     lists = lists + f'💠 {data[:19]} | {dict.name}\n'
     print(32)
-    cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}")')
+    cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}", "{dict.name}")')
     print(46)
     conn.commit()
 
