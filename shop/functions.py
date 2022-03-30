@@ -353,29 +353,22 @@ def profile(user_id):
 
 
 def buy(dict):
-    print(7)
     conn = sqlite3.connect('base_ts.sqlite')
     cursor = conn.cursor()
 
     data = str(datetime.datetime.now())
     lists = ''
     cursor.execute(f'SELECT * FROM "{dict.product}"')
-    print(7)
-    print(32)
     lists = lists + f'💠 {data[:19]} | {dict.name}\n'
-    print(32)
     cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}", "{dict.name}")')
-    print(46)
     conn.commit()
 
     # cursor.execute(f'UPDATE {dict.code} SET amount_MAX = amount_MAX-{"amount"} WHERE code = "{dict.code}"')
     conn.commit()
-    print(7)
     balance = cursor.execute(f'SELECT * FROM users WHERE user_id = "{dict.user_id}"').fetchone()
     balance = float(balance[5]) - (float(dict.price))
     cursor.execute(f'UPDATE users SET balance = "{balance}" WHERE user_id = "{dict.user_id}"')
     conn.commit()
-    print(99)
 
     return lists
 

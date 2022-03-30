@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import sqlite3
+
+from telebot.types import InlineKeyboardButton
+
 import menu
 import settings
 import functions as func
@@ -9,6 +12,8 @@ from telebot import types
 import time
 import datetime
 import random
+import json
+import requests
 
 catalog_dict = {}
 product_dict = {}
@@ -26,8 +31,7 @@ def start_bot():
         chat_id = message.chat.id
         func.first_join(user_id=chat_id, name=message.from_user.username, code=message.text[6:])
         bot.send_message(chat_id,
-                         'Добро пожаловать {}, user id - {}'.format(message.from_user.first_name,
-                                                                    chat_id, ),
+                         f'Добро пожаловать {message.from_user.first_name}',
                          reply_markup=menu.main_menu)
 
     # Command admin
@@ -158,6 +162,17 @@ def start_bot():
                                       balance=info[5]
                                   ),
                                   reply_markup=menu.main_menu)
+
+        if call.data == 'replenishment':
+            try:
+                msg = bot.send_message(chat_id=chat_id,
+                                       text='Введите сумму пополнения в рублях')
+                bot.register_next_step_handler(msg, replenishment)
+
+            except:
+                bot.send_message(chat_id=chat_id,
+                                 text='⚠️ Что-то пошло не по плану',
+                                 reply_markup=menu.main_menu)
 
         # Admin menu
         if call.data == 'admin_info':
@@ -440,20 +455,15 @@ def start_bot():
 
     def buy_2(message):
         try:
-            print(0)
             product = product_dict[message.chat.id]
             if int(message.text) == product.code:
                 check = func.check_balance(product.user_id, (float(product.price)))
-                print(111)
 
                 if check == 1:
-                    print(2)
                     lists = func.buy(product)
-                    print(34)
                     bot.send_message(chat_id=message.chat.id,
                                      text=f'✅ Вы успешно купили товар\n\n{lists}',
                                      reply_markup=menu.main_menu)
-                    print(9)
                     info = func.profile(message.chat.id)
                     bot.send_message(chat_id=settings.admin_id,
                                      text=f'✅ Куплен товар\n\n'
@@ -463,23 +473,19 @@ def start_bot():
                                           f'❕ Купленный товар ⬇️\n\n{lists}')
 
                     try:
-                        print(3)
                         bot.send_message(chat_id=f'{settings.CHANNEL_ID}',
                                          text=f'✅ Куплен товар\n\n'
                                               f'❕ Купил - @{info[1]}\n'
                                               f'❕ Сумма покупки - {float(product.price)}\n'
                                               f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                               f'❕ Купленный товар ⬇️\n\n{lists}')
-                        print(4)
 
                     except:
-                        print(5)
                         pass
 
                 if check == 0:
                     bot.send_message(chat_id=message.chat.id,
                                      text='❌ На балансе недостаточно средств')
-                    print(1)
 
             else:
                 bot.send_message(chat_id=message.chat.id,
@@ -851,6 +857,31 @@ def start_bot():
             pass
             bot.send_message(chat_id=message.chat.id,
                              text='Упсс, что-то пошло не по плану')
+
+    def replenishment(message):
+        try:
+            print(6)
+            print(message.text)
+            amount = message.text
+            data = requests.get(
+                f'https://api.crystalpay.ru/v1/?s=396107de3143d96f4c791dcdcb3ba00e34acbb23&n=News12&o=receipt-create&amount={amount}')
+            new = data.json()
+            url = new.get('url')
+            id = new.get('id')
+
+            replenishments = types.InlineKeyboardMarkup(row_width=2)
+            replenishments.add(
+                types.InlineKeyboardButton(text='Купить', url=url),
+                types.InlineKeyboardButton(text='Отменить платеж', callback_data='exit_to_menu'),
+            )
+            print(7)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Счёт на оплату с уникальным идентификатором {id}',
+                             reply_markup=replenishments,
+                             )
+            print(8)
+        except:
+                pass
 
     bot.polling(none_stop=True)
 

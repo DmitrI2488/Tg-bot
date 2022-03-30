@@ -8,7 +8,7 @@ main_menu.add(
     types.InlineKeyboardButton(text='👤 Профиль', callback_data='profile'),
     types.InlineKeyboardButton(text='ℹ️ Информация', callback_data='info'),
     types.InlineKeyboardButton(text='🛒 Мои покупки', callback_data='purchases'),
-    types.InlineKeyboardButton(text='💸 Пополнить баланс', callback_data='replenish_balance'),
+    types.InlineKeyboardButton(text='💸 Пополнить баланс', callback_data='replenishment'),
 )
 main_menu.add(
     types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
@@ -42,6 +42,7 @@ admin_menu_control_section.add(
     types.InlineKeyboardButton(text='Загрузить товар', callback_data='download_product'),
     types.InlineKeyboardButton(text='Назад', callback_data='back_to_admin_menu')
 )
+
 
 # Back to admin menu
 back_to_admin_menu = types.InlineKeyboardMarkup(row_width=1)
