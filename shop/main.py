@@ -78,6 +78,7 @@ def start_bot():
             cursor = conn.cursor()
             cursor.execute(f'SELECT * FROM "{call.data}"')
             row = cursor.fetchall()
+
             product = func.Product(chat_id)
             product_dict[chat_id] = product
             product = product_dict[chat_id]
@@ -85,42 +86,34 @@ def start_bot():
             info = func.menu_product(call.data, product)
             product.product = info[1].product
             product.section = info[1].section
-            product.amountMAX = info[1].amountMAX
             product.price = info[1].price
-            if product.amountMAX >= 0:
-                product = func.Product(chat_id)
-                product_dict[chat_id] = product
-                product = product_dict[chat_id]
+            product.name = info[1].name
 
-                info = func.menu_product(call.data, product)
-                product.product = info[1].product
-                product.section = info[1].section
-                product.amountMAX = info[1].amountMAX
-                product.price = info[1].price
-
-                bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=message_id,
-                    text=info[0],
-                    reply_markup=menu.btn_purchase
-                )
-
-            # if product.amountMAX == 0:
-            #     bot.edit_message_text(
-            #         chat_id=chat_id,
-            #         message_id=message_id,
-            #         text='Товар закончился, напишите в тех. поддержку',
-            #         reply_markup=menu.main_menu
-            #     )
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=info[0],
+                reply_markup=menu.btn_purchase
+            )
 
         if call.data == 'buy':
             try:
-                product = product_dict[chat_id]
-                msg = bot.send_message(chat_id=chat_id,
-                                       text=f'❕ Введите кол-во товара\n❕ От 1 - {product.amountMAX}')
-                bot.register_next_step_handler(msg, buy)
+                 print(34)
+                 product = product_dict[chat_id]
+
+                 code = random.randint(111, 999)
+                 product.code = code
+
+                 msg = bot.send_message(chat_id=chat_id,
+                                        text=f'❕ Вы выбрали - {product.name}\n'
+                                             f'❕ Цена - {float(product.price)} руб\n'
+                                         f'👉 Для подтверждения покупки отправьте {code}')
+                 bot.register_next_step_handler(msg, buy_2)
+
             except:
-                pass
+                bot.send_message(chat_id=chat_id,
+                                  text='⚠️ Что-то пошло не по плану',
+                                  reply_markup=menu.main_menu)
 
         if call.data == 'info':
             bot.edit_message_text(
@@ -426,37 +419,32 @@ def start_bot():
                              text='⚠️ Что-то пошло не по плану',
                              reply_markup=menu.main_menu)
 
-    def buy(message):
-        try:
-            product = product_dict[message.chat.id]
-            if int(message.text) in range(1, int(product.amountMAX) + 1):
-                product.amount = int(message.text)
-
-                code = random.randint(111, 999)
-                product.code = code
-
-                msg = bot.send_message(chat_id=message.chat.id,
-                                       text=f'❕ Вы выбрали - {product.product}\n'
-                                            f'❕ Кол-во - {product.amount}\n'
-                                            f'❕ Цена - {float(product.price) * int(product.amount)} руб\n'
-                                            f'👉 Для подтверждения покупки отправьте {code}')
-                bot.register_next_step_handler(msg, buy_2)
-            else:
-                bot.send_message(chat_id=message.chat.id,
-                                 text='❌ Неверное кол-во',
-                                 reply_markup=menu.main_menu)
-        except:
-            bot.send_message(chat_id=message.chat.id,
-                             text='⚠️ Что-то пошло не по плану',
-                             reply_markup=menu.main_menu)
+    # def buy(message):
+    #     try:
+    #         print(34)
+    #         product = product_dict[message.chat.id]
+    #
+    #         code = random.randint(111, 999)
+    #         product.code = code
+    #
+    #         msg = bot.send_message(chat_id=message.chat.id,
+    #                                text=f'❕ Вы выбрали - {product.name}\n'
+    #                                     f'❕ Цена - {float(product.price)} руб\n'
+    #                                     f'👉 Для подтверждения покупки отправьте {code}')
+    #         bot.register_next_step_handler(msg, buy_2)
+    #
+    #     except:
+    #         bot.send_message(chat_id=message.chat.id,
+    #                          text='⚠️ Что-то пошло не по плану',
+    #                          reply_markup=menu.main_menu)
 
     def buy_2(message):
         try:
             print(0)
             product = product_dict[message.chat.id]
             if int(message.text) == product.code:
-                check = func.check_balance(product.user_id, (float(product.price) * int(product.amount)))
-                print(1)
+                check = func.check_balance(product.user_id, (float(product.price)))
+                print(111)
 
                 if check == 1:
                     print(2)
@@ -466,11 +454,11 @@ def start_bot():
                                      text=f'✅ Вы успешно купили товар\n\n{lists}',
                                      reply_markup=menu.main_menu)
                     print(9)
-
+                    info = func.profile(message.chat.id)
                     bot.send_message(chat_id=settings.admin_id,
                                      text=f'✅ Куплен товар\n\n'
-                                          f'❕ Купил - {message.chat.id}\n'
-                                          f'❕ Сумма покупки - {float(product.price) * int(product.amountMAX)}\n'
+                                          f'❕ Купил - @{info[1]}\n'
+                                          f'❕ Сумма покупки - {float(product.price)}\n'
                                           f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                           f'❕ Купленный товар ⬇️\n\n{lists}')
 
@@ -478,8 +466,8 @@ def start_bot():
                         print(3)
                         bot.send_message(chat_id=f'{settings.CHANNEL_ID}',
                                          text=f'✅ Куплен товар\n\n'
-                                              f'❕ Купил - {message.chat.id}\n'
-                                              f'❕ Сумма покупки - {float(product.price) * int(product.amount)}\n'
+                                              f'❕ Купил - @{info[1]}\n'
+                                              f'❕ Сумма покупки - {float(product.price)}\n'
                                               f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                               f'❕ Купленный товар ⬇️\n\n{lists}')
                         print(4)
@@ -591,6 +579,7 @@ def start_bot():
             product_name = message.text
             product = product_dict[message.chat.id]
             product.product = product_name
+            product.name = product_name
 
             msg = bot.send_message(chat_id=message.chat.id,
                                    text='Введите цены на товар')
@@ -618,20 +607,6 @@ def start_bot():
             product = product_dict[message.chat.id]
             product.info = message.text
 
-            msg = bot.send_message(chat_id=message.chat.id,
-                                   text='Введите кол-во товара')
-
-            bot.register_next_step_handler(msg, create_product_5)
-        except Exception as e:
-            bot.send_message(chat_id=message.chat.id,
-                             text='Упсс, что-то пошло не по плану')
-
-    def create_product_5(message):
-        try:
-            amountMAX = message.text
-            product = product_dict[message.chat.id]
-            product.amountMAX = amountMAX
-
             markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
             markup.add('Yes', 'No')
 
@@ -640,18 +615,19 @@ def start_bot():
                                    text=f'{product_name}\n\n'
                                         'Создать?',
                                    reply_markup=markup)
-            bot.register_next_step_handler(msg, create_product_6)
+            bot.register_next_step_handler(msg, create_product_5)
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text='Упсс, что-то пошло не по плану')
 
-    def create_product_6(message):
+    def create_product_5(message):
         try:
             if message.text == 'Yes':
                 product = product_dict[message.chat.id]
                 product_name = f'{product.product} | {product.price} руб'
 
-                func.add_product_to_section(product_name, product.price, product.section, product.info, product.amountMAX)
+                func.add_product_to_section(product_name, product.price, product.section, product.info, product.product)
+
                 bot.send_message(
                     chat_id=message.chat.id,
                     text=f'✅Товар: {product_name}\n'

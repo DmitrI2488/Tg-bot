@@ -21,8 +21,8 @@ class Product:
         self.section = None
         self.price = None
         self.amount = None
-        self.amountMAX = None
         self.code = None
+        self.name = None
 
 
 class AddProduct:
@@ -31,7 +31,7 @@ class AddProduct:
         self.product = None
         self.price = None
         self.info = None
-        self.amountMAX = None
+        self.name = None
 
 
 class DownloadProduct:
@@ -102,21 +102,18 @@ def menu_product(product, dict):
     section = row[1]
     info = row[3]
 
-    amount = row[4]
-
     cursor.execute(f'SELECT * FROM "{section}" WHERE code = "{product}"')
     row = cursor.fetchone()
 
     dict.section = section
     dict.product = product
-    dict.amountMAX = amount
     dict.price = row[1]
+    dict.name = row[3]
 
     text = settings.text_purchase.format(
         name=row[0],
         info=info,
         price=row[1],
-        amountMAX=amount,
     )
 
     return text, dict
@@ -133,7 +130,7 @@ def add_section_to_catalog(name_section):
     conn.commit()
 
     # Create table section
-    conn.execute(f"CREATE TABLE '{code}' (list text, price text, code text, amount_MAX INTEGER)")
+    conn.execute(f"CREATE TABLE '{code}' (list text, price text, code text)")
 
     # Close connection
     cursor.close()
@@ -166,18 +163,18 @@ def del_section_to_catalog(name_section):
 
 
 # Admin menu - add_product_to_section
-def add_product_to_section(name_product, price, name_section, info, amountMAX):
+def add_product_to_section(name_product, price, name_section, info, name):
     # Connection
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
 
     code = random.randint(11111, 99999)
 
-    cursor.execute(f"INSERT INTO '{name_section}' VALUES ('{name_product}', '{price}', '{code}', '{amountMAX}')")
+    cursor.execute(f"INSERT INTO '{name_section}' VALUES ('{name_product}', '{price}', '{code}', '{name}')")
     conn.commit()
 
     cursor.execute(
-        f"INSERT INTO 'section' VALUES ('{name_product}', '{name_section}', '{code}', '{info}', '{amountMAX}')")
+        f"INSERT INTO 'section' VALUES ('{name_product}', '{name_section}', '{code}', '{info}', '{name}')")
     conn.commit()
 
     # Create table product
@@ -365,22 +362,19 @@ def buy(dict):
     data = str(datetime.datetime.now())
     lists = ''
     cursor.execute(f'SELECT * FROM "{dict.product}"')
-    row = cursor.fetchmany(dict.amount)
-    print(row)
     print(7)
-    for i in range(int(dict.amount)):
-        print(32)
-        # lists = lists + f'💠 {data[:19]} | {row[i][0]}\n'
-        print(32)
-        cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}")')
-        print(46)
-        conn.commit()
+    print(32)
+    lists = lists + f'💠 {data[:19]} | {dict.name}\n'
+    print(32)
+    cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}")')
+    print(46)
+    conn.commit()
 
-        # cursor.execute(f'UPDATE {dict.code} SET amount_MAX = amount_MAX-{"amount"} WHERE code = "{dict.code}"')
-        conn.commit()
+    # cursor.execute(f'UPDATE {dict.code} SET amount_MAX = amount_MAX-{"amount"} WHERE code = "{dict.code}"')
+    conn.commit()
     print(7)
     balance = cursor.execute(f'SELECT * FROM users WHERE user_id = "{dict.user_id}"').fetchone()
-    balance = float(balance[5]) - (float(dict.price) * float(dict.amount))
+    balance = float(balance[5]) - (float(dict.price))
     cursor.execute(f'UPDATE users SET balance = "{balance}" WHERE user_id = "{dict.user_id}"')
     conn.commit()
     print(99)
@@ -512,8 +506,7 @@ def admin_top_ref():
     cursor.execute(f'SELECT * FROM ref_log')
     users = cursor.fetchall()
 
-    msg = '<b>Это топ рефералов за все время:</b>\n' \
-
+    msg = '<b>Это топ рефералов за все время:</b>\n'
     for i in users:
         msg = msg + f'{i[0]}/{i[2]} - {i[1]} ₽\n'
 
