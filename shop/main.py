@@ -165,14 +165,45 @@ def start_bot():
 
         if call.data == 'replenishment':
             try:
-                msg = bot.send_message(chat_id=chat_id,
-                                       text='Введите сумму пополнения в рублях')
-                bot.register_next_step_handler(msg, replenishment)
+                bot.send_message(chat_id=chat_id,
+                                 text='Выберите подходящий вам способ',
+                                 reply_markup=menu.replenishments)
 
             except:
                 bot.send_message(chat_id=chat_id,
                                  text='⚠️ Что-то пошло не по плану',
                                  reply_markup=menu.main_menu)
+
+        if call.data == 'crypto':
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text='Выберите криптовалюту которой хотите произвести оплату',
+                                  reply_markup=menu.crypto)
+
+        if call.data == 'no_crypto':
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text=f'Вам необходимо приобрести криптовалюту через @CryptoBot\n'
+                                       f'Обратите внимание, что у нас есть поддержка следующих криптовалют\n'
+                                       f'Bitcoin|BTC\n'
+                                       f'Etherium|ETH\n'
+                                       f'Dogecoin|DOGE\n'
+                                       f'Litecoin|LTC\n'
+                                       f'DASH|DASH\n'
+                                       f'После приобретения криптовалюты вернитесь в раздел: У меня есть криптовалюта\n'
+                                       f'Выберите нужную вам криптовалюту и произведите перевод\n'
+                                       f'После подтвержения платежа, деньги будут зачислены на ваш счет',
+
+                                  )
+        if call.data == 'main':
+            bot.send_message(chat_id,
+                             f'Добро пожаловать!',
+                             reply_markup=menu.main_menu)
+
+        if call.data == 'BTC':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, btc)
 
         # Admin menu
         if call.data == 'admin_info':
@@ -840,6 +871,25 @@ def start_bot():
         else:
             bot.send_message(message.chat.id, text='Рассылка отменена')
 
+    def btc(message):
+        try:
+            response = requests.get(url='https://yobit.net/api/3/ticker/btc_rur').json()
+            btc_rur = response.get('btc_rur')
+            cost = btc_rur.get('sell')
+            print(cost)
+            sums = float(message.text) / cost
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Счёт на оплату создан\n'
+                                  f'Произведите перевод на адрес:\n'
+                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l'
+                                  f'Сумма перевода: {sums}BTC\n'
+                                  f'После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+
+
+        except:
+            pass
+
     @bot.message_handler(content_types=['document'])
     def download_product_4(message):
         try:
@@ -860,30 +910,6 @@ def start_bot():
             pass
             bot.send_message(chat_id=message.chat.id,
                              text='Упсс, что-то пошло не по плану')
-
-    def replenishment(message):
-        try:
-            print(message.text)
-            amount = message.text
-            # data = requests.get(
-            #     f'https://api.crystalpay.ru/v1/?s=396107de3143d96f4c791dcdcb3ba00e34acbb23&n=News12&o=receipt-create&amount={amount}')
-            # new = data.json()
-            # url = new.get('url')
-            # id = new.get('id')
-
-            replenishments = types.InlineKeyboardMarkup(row_width=2)
-            replenishments.add(
-                types.InlineKeyboardButton(text='У меня есть криптовалюта', callback_data='crypto'),
-                types.InlineKeyboardButton(text='У меня нет криптовалюты', callback_data='no_crypto'),
-            )
-
-            bot.send_message(chat_id=message.chat.id,
-                             text=f'Счёт на оплату с уникальным идентификатором {id}',
-                             reply_markup=replenishments,
-                             )
-            print(8)
-        except:
-                pass
 
     bot.polling(none_stop=True)
 

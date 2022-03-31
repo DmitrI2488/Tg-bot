@@ -14,6 +14,36 @@ main_menu.add(
     types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
 )
 
+crypto = types.InlineKeyboardMarkup(row_width=1)
+crypto.add(
+    types.InlineKeyboardButton(text='Bitcoin|BTC', callback_data='BTC'),
+    types.InlineKeyboardButton(text='Etherium|ETH', callback_data='ETH'),
+    types.InlineKeyboardButton(text='Dogecoin|DOGE', callback_data='DOGE'),
+    types.InlineKeyboardButton(text='Litecoin|LTC', callback_data='LTC'),
+    types.InlineKeyboardButton(text='DASH|DASH', callback_data='DASH'),
+    types.InlineKeyboardButton(text='Назад', callback_data='replenishment'),
+)
+
+replenishments = types.InlineKeyboardMarkup(row_width=1)
+replenishments.add(
+    types.InlineKeyboardButton(text='У меня есть криптовалюта', callback_data='crypto'),
+    types.InlineKeyboardButton(text='У меня нет криптовалюты', callback_data='no_crypto'),
+    types.InlineKeyboardButton(text='Назад', callback_data='main'),
+)
+
+no_crypto_back = types.InlineKeyboardMarkup(row_width=1)
+no_crypto_back.add(
+    types.InlineKeyboardButton(text='Я приобрел, выбрать кошелек', callback_data='crypto'),
+    types.InlineKeyboardButton(text='Назад', callback_data='replenishment'),
+)
+
+btc = types.InlineKeyboardMarkup(row_width=1)
+btc.add(
+    types.InlineKeyboardButton(text='Я оплатил', callback_data='i_pay'),
+    types.InlineKeyboardButton(text='Назад', callback_data='crypto'),
+)
+
+
 # Admin menu
 admin_menu = types.InlineKeyboardMarkup(row_width=2)
 admin_menu.add(types.InlineKeyboardButton(text='Управление каталогом', callback_data='catalog_control'))
