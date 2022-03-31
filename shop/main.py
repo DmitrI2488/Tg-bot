@@ -169,6 +169,22 @@ def start_bot():
                                  text='Выберите подходящий вам способ',
                                  reply_markup=menu.replenishments)
 
+
+
+            except:
+                bot.send_message(chat_id=chat_id,
+                                 text='⚠️ Что-то пошло не по плану',
+                                 reply_markup=menu.main_menu)
+
+        if call.data == 'replenishment2':
+            try:
+                bot.edit_message_text(chat_id=chat_id,
+                                      message_id=message_id,
+                                      text='Выберите подходящий вам способ',
+                                      reply_markup=menu.replenishments)
+
+
+
             except:
                 bot.send_message(chat_id=chat_id,
                                  text='⚠️ Что-то пошло не по плану',
@@ -186,13 +202,16 @@ def start_bot():
                                   text=f'Вам необходимо приобрести криптовалюту через @CryptoBot\n'
                                        f'Обратите внимание, что у нас есть поддержка следующих криптовалют\n'
                                        f'Bitcoin|BTC\n'
-                                       f'Etherium|ETH\n'
-                                       f'Dogecoin|DOGE\n'
-                                       f'Litecoin|LTC\n'
-                                       f'DASH|DASH\n'
+                                       f'Monero|XMR\n'
+                                       f'Binance coin|BNB\n'
+                                       f'Binance USD|BUSD\n'
+                                       f'USD Coin|USDC\n'
+                                       f'Tether|USDT\n'
+                                       f'Dash|DASH\n'
                                        f'После приобретения криптовалюты вернитесь в раздел: У меня есть криптовалюта\n'
                                        f'Выберите нужную вам криптовалюту и произведите перевод\n'
                                        f'После подтвержения платежа, деньги будут зачислены на ваш счет',
+                                  reply_markup=menu.i_buy_cr,
 
                                   )
         if call.data == 'main':
@@ -205,6 +224,30 @@ def start_bot():
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, btc)
 
+        if call.data == 'XMR':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, xmr)
+
+        if call.data == 'BNB':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, bnb)
+
+        if call.data == 'USDC':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, usdc)
+
+        if call.data == 'USDT':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, usdt)
+
+        if call.data == 'DASH':
+            msg = bot.send_message(chat_id=chat_id,
+                                   text=f'Укажите какую сумму в рублях, хотите пополнить')
+            bot.register_next_step_handler(msg, dash)
         # Admin menu
         if call.data == 'admin_info':
             bot.edit_message_text(
@@ -873,16 +916,135 @@ def start_bot():
 
     def btc(message):
         try:
-            response = requests.get(url='https://yobit.net/api/3/ticker/btc_rur').json()
-            btc_rur = response.get('btc_rur')
-            cost = btc_rur.get('sell')
+            msg = message.text
+            print(msg)
+            response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=BTCBUSD').json()
+            cost = response.get('price')
+            rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+            usd = rub.get('Valute')
+            ur = usd.get('USD')
+            ur = ur.get('Value')
+            print(ur)
             print(cost)
-            sums = float(message.text) / cost
+            sums = float(message.text) / float(cost)
+            sums = sums / float(ur)
+            print(sums)
+            print(msg)
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
                                   f'Произведите перевод на адрес:\n'
-                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l'
-                                  f'Сумма перевода: {sums}BTC\n'
+                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'Сумма перевода: {sums} BTC\n'
+                                  f'После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+
+
+        except:
+            pass
+
+    def xmr(message):
+        try:
+            msg = message.text
+            print(msg)
+            response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=XMRUSDT').json()
+            cost = response.get('price')
+            rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+            usd = rub.get('Valute')
+            ur = usd.get('USD')
+            ur = ur.get('Value')
+            print(ur)
+            print(cost)
+            sums = float(message.text) / float(cost)
+            sums = sums / float(ur)
+            print(sums)
+            print(msg)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Счёт на оплату создан\n'
+                                  f'Произведите перевод на адрес:\n'
+                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'Сумма перевода: {sums} XMR\n'
+                                  f'После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+
+
+        except:
+            pass
+
+    def bnb(message):
+        try:
+            msg = message.text
+            print(msg)
+            response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=BNBBUSD').json()
+            cost = response.get('price')
+            rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+            usd = rub.get('Valute')
+            ur = usd.get('USD')
+            ur = ur.get('Value')
+            print(ur)
+            print(cost)
+            sums = float(message.text) / float(cost)
+            sums = sums / float(ur)
+            print(sums)
+            print(msg)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Счёт на оплату создан\n'
+                                  f'Произведите перевод на адрес:\n'
+                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'Сумма перевода: {sums} BNB\n'
+                                  f'После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+
+
+        except:
+            pass
+
+    def usdt(message):
+        response = requests.get(url='https://yobit.net/api/3/ticker/usdt_rur').json()
+        btc_rur = response.get('usdt_rur')
+        cost = btc_rur.get('sell')
+        sums = float(message.text) / float(cost)
+        bot.send_message(chat_id=message.chat.id,
+                         text=f'Счёт на оплату создан\n'
+                              f'Произведите перевод на адрес:\n'
+                              f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                              f'Сумма перевода: {sums} USDT\n'
+                              f'После оплаты нажмите: Я оплатил',
+                         reply_markup=menu.btc)
+
+    def usdc(message):
+        response = requests.get(url='https://yobit.net/api/3/ticker/usdc_rur').json()
+        btc_rur = response.get('usdc_rur')
+        cost = btc_rur.get('sell')
+        sums = float(message.text) / float(cost)
+        bot.send_message(chat_id=message.chat.id,
+                         text=f'Счёт на оплату создан\n'
+                              f'Произведите перевод на адрес:\n'
+                              f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                              f'Сумма перевода: {sums} USDC\n'
+                              f'После оплаты нажмите: Я оплатил',
+                         reply_markup=menu.btc)
+
+    def dash(message):
+        try:
+            msg = message.text
+            print(msg)
+            response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=DASHUSDT').json()
+            cost = response.get('price')
+            rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+            usd = rub.get('Valute')
+            ur = usd.get('USD')
+            ur = ur.get('Value')
+            print(ur)
+            print(cost)
+            sums = float(message.text) / float(cost)
+            sums = sums / float(ur)
+            print(sums)
+            print(msg)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Счёт на оплату создан\n'
+                                  f'Произведите перевод на адрес:\n'
+                                  f'bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'Сумма перевода: {sums} DASH\n'
                                   f'После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
 

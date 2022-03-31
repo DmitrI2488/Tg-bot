@@ -14,14 +14,27 @@ main_menu.add(
     types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
 )
 
+i_buy_cr = types.InlineKeyboardMarkup(row_width=1)
+i_buy_cr.add(
+    types.InlineKeyboardButton(text='Я приобрел', callback_data='crypto'),
+    types.InlineKeyboardButton(text='Назад', callback_data='replenishment2'),
+)
+# f'Bitcoin|BTC\n'
+#                                        f'Monero|XMR\n'
+#                                        f'Binance coin|BNB\n'
+#                                        f'Binance USD|BUSD\n'
+#                                        f'USD Coin|USDC\n'
+#                                        f'Tether|USDT\n'
+#                                        f'Dash|DASH\n'
 crypto = types.InlineKeyboardMarkup(row_width=1)
 crypto.add(
     types.InlineKeyboardButton(text='Bitcoin|BTC', callback_data='BTC'),
-    types.InlineKeyboardButton(text='Etherium|ETH', callback_data='ETH'),
-    types.InlineKeyboardButton(text='Dogecoin|DOGE', callback_data='DOGE'),
-    types.InlineKeyboardButton(text='Litecoin|LTC', callback_data='LTC'),
-    types.InlineKeyboardButton(text='DASH|DASH', callback_data='DASH'),
-    types.InlineKeyboardButton(text='Назад', callback_data='replenishment'),
+    types.InlineKeyboardButton(text='Monero|XMR', callback_data='XMR'),
+    types.InlineKeyboardButton(text='Binance coin|BNB', callback_data='BNB'),
+    types.InlineKeyboardButton(text='USD Coin|USDC', callback_data='USDC'),
+    types.InlineKeyboardButton(text='Tether|USDT', callback_data='USDT'),
+    types.InlineKeyboardButton(text='Dash|DASH', callback_data='DASH'),
+    types.InlineKeyboardButton(text='Назад', callback_data='replenishment2'),
 )
 
 replenishments = types.InlineKeyboardMarkup(row_width=1)
