@@ -157,7 +157,7 @@ def start_bot():
                                   message_id=message_id,
                                   text=settings.profile.format(
                                       id=info[0],
-                                      login=f'@{info[1]}',
+                                      login=f'{info[1]}',
                                       data=info[2][:19],
                                       balance=info[5]
                                   ),
@@ -345,7 +345,8 @@ def start_bot():
 
         if call.data == 'give_balance':
             msg = bot.send_message(chat_id=chat_id,
-                                   text='Введите ID человека, которому будет изменён баланс')
+                                   text=f'Введите USERNAME человека, которому будет изменён баланс\n'
+                                        f'Username необходимо вводить с @')
 
             bot.register_next_step_handler(msg, give_balance)
 
@@ -382,7 +383,6 @@ def start_bot():
 
             msg = bot.send_message(chat_id=message.chat.id,
                                    text='Введите сумму на которую изменится баланс(к балансу не добавится эта сумма, а баланс изменится на неё)')
-
             bot.register_next_step_handler(msg, give_balance_2)
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
@@ -396,7 +396,7 @@ def start_bot():
             code = random.randint(111, 999)
             balance.code = code
             msg = bot.send_message(chat_id=message.chat.id,
-                                   text=f'ID - {balance.login}\n'
+                                   text=f'Username - {balance.login}\n'
                                         f'Баланс изменится на - {balance.balance}\n'
                                         f'Для подтверждения введите {code}')
 
@@ -413,6 +413,9 @@ def start_bot():
                 func.give_balance(balance)
                 bot.send_message(chat_id=message.chat.id,
                                  text='✅ Баланс успешно изменён')
+                bot.send_message(chat_id=func.get_id(balance.login),
+                                 text=f'Пополнение счёта прошло успешно\n'
+                                      f'Ваш баланс: {balance.balance}р')
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text='⚠️ Что-то пошло не по плану',
@@ -860,21 +863,20 @@ def start_bot():
 
     def replenishment(message):
         try:
-            print(6)
             print(message.text)
             amount = message.text
-            data = requests.get(
-                f'https://api.crystalpay.ru/v1/?s=396107de3143d96f4c791dcdcb3ba00e34acbb23&n=News12&o=receipt-create&amount={amount}')
-            new = data.json()
-            url = new.get('url')
-            id = new.get('id')
+            # data = requests.get(
+            #     f'https://api.crystalpay.ru/v1/?s=396107de3143d96f4c791dcdcb3ba00e34acbb23&n=News12&o=receipt-create&amount={amount}')
+            # new = data.json()
+            # url = new.get('url')
+            # id = new.get('id')
 
             replenishments = types.InlineKeyboardMarkup(row_width=2)
             replenishments.add(
-                types.InlineKeyboardButton(text='Купить', url=url),
-                types.InlineKeyboardButton(text='Отменить платеж', callback_data='exit_to_menu'),
+                types.InlineKeyboardButton(text='У меня есть криптовалюта', callback_data='crypto'),
+                types.InlineKeyboardButton(text='У меня нет криптовалюты', callback_data='no_crypto'),
             )
-            print(7)
+
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату с уникальным идентификатором {id}',
                              reply_markup=replenishments,

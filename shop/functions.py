@@ -43,6 +43,7 @@ class DownloadProduct:
 class GiveBalance:
     def __init__(self, login):
         self.login = login
+        self.user_id = None
         self.balance = None
         self.code = None
 
@@ -238,6 +239,8 @@ def first_join(user_id, name, code):
     cursor = conn.cursor()
     row = cursor.execute(f'SELECT * FROM users WHERE user_id = "{user_id}"').fetchall()
 
+    name = f'@{name}'
+
     ref_code = code
     if ref_code == '':
         ref_code = 0
@@ -360,7 +363,8 @@ def buy(dict):
     lists = ''
     cursor.execute(f'SELECT * FROM "{dict.product}"')
     lists = lists + f'💠 {data[:19]} | {dict.name}\n'
-    cursor.execute(f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}", "{dict.name}")')
+    cursor.execute(
+        f'INSERT INTO purchase_information VALUES ("{dict.user_id}", "{dict.code}", "{data}", "{dict.name}")')
     conn.commit()
 
     # cursor.execute(f'UPDATE {dict.code} SET amount_MAX = amount_MAX-{"amount"} WHERE code = "{dict.code}"')
@@ -377,7 +381,7 @@ def give_balance(dict):
     conn = sqlite3.connect('base_ts.sqlite')
     cursor = conn.cursor()
 
-    cursor.execute(f'UPDATE users SET balance = "{dict.balance}" WHERE user_id = "{dict.login}"')
+    cursor.execute(f'UPDATE users SET balance = "{dict.balance}" WHERE name = "{dict.login}"')
     conn.commit()
 
 
@@ -502,3 +506,11 @@ def admin_top_ref():
         msg = msg + f'{i[0]}/{i[2]} - {i[1]} ₽\n'
 
     return msg
+
+
+def get_id(username):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT user_id FROM users WHERE name = "{username}"')
+    user = cursor.fetchone()
+    return user[0]
