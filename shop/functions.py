@@ -63,13 +63,13 @@ class Admin_sending_messages:
 
 
 class replenishment:
-    def __init__(self, valute):
-        self.username = None
-        self.sum = None
+    def __init__(self, valute, username, sums, crypt):
+        self.username = username
+        self.sum = sums
         self.i_pay = 0
         self.valute = valute
         self.code = random.randint(111, 999)
-        self.crypt = None
+        self.crypt = crypt
 
 
 # Menu catalog
@@ -210,7 +210,7 @@ def create_pay(username, sum, valute, code, crypt, chat_id):
 
     i_pays = 0
     status = 0
-
+    username = f'@{username}'
     cursor.execute(
         f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}", "{status}", "{chat_id}")')
     conn.commit()
@@ -573,6 +573,7 @@ def ok_pays(username):
 def agree(username, sum):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
-    cursor.execute(f'UPDATE users SET balance = {sum} WHERE name = "{username}"')
-    row = cursor.fetchall()
-    return row
+    cursor.execute(f'UPDATE users SET balance = balance + {sum} WHERE name = "{username}"')
+    conn.commit()
+    cursor.execute(f'UPDATE replenishment SET status = "1" WHERE username = "{username}"')
+    conn.commit()
