@@ -21,7 +21,7 @@ download_dict = {}
 balance_dict = {}
 admin_sending_messages_dict = {}
 replenishment_dict = {}
-
+ok_pay_dict = {}
 
 def start_bot():
     bot = telebot.TeleBot(settings.bot_token)
@@ -395,6 +395,11 @@ def start_bot():
                                        f'Как только платеж подтвердят деньги будут зачислены на ваш баланс',
                                   reply_markup=menu.main_menu)
 
+        if call.data == 'ok_pay':
+            msg = bot.send_message(chat_id=call.message.chat.id,
+                                   text=f'Введите username пользователя с @\n'
+                                        f'Платежи которого вы хотите проверить')
+            bot.register_next_step_handler(msg, ok_pay)
 
         if call.data == 'cancel_payment':
             func.cancel_payment(chat_id)
@@ -466,6 +471,13 @@ def start_bot():
                 parse_mode='html'
             )
 
+        if call.data.isdigit():
+            func.agree(ok_pay_dict[int(call.data)].username, ok_pay_dict[int(call.data)].sum)
+            bot.send_message(
+                chat_id=chat_id,
+                text='Платеж подтвержден',
+            )
+
     def give_balance(message):
         try:
             balance = func.GiveBalance(message.text)
@@ -526,25 +538,6 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text='⚠️ Что-то пошло не по плану',
                              reply_markup=menu.main_menu)
-
-    # def buy(message):
-    #     try:
-    #         print(34)
-    #         product = product_dict[message.chat.id]
-    #
-    #         code = random.randint(111, 999)
-    #         product.code = code
-    #
-    #         msg = bot.send_message(chat_id=message.chat.id,
-    #                                text=f'❕ Вы выбрали - {product.name}\n'
-    #                                     f'❕ Цена - {float(product.price)} руб\n'
-    #                                     f'👉 Для подтверждения покупки отправьте {code}')
-    #         bot.register_next_step_handler(msg, buy_2)
-    #
-    #     except:
-    #         bot.send_message(chat_id=message.chat.id,
-    #                          text='⚠️ Что-то пошло не по плану',
-    #                          reply_markup=menu.main_menu)
 
     def buy_2(message):
         try:
@@ -943,7 +936,7 @@ def start_bot():
             sums = float("%.7f" % sums)
 
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
@@ -972,7 +965,7 @@ def start_bot():
             sums = float("%.7f" % sums)
 
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
@@ -998,7 +991,7 @@ def start_bot():
             sums = float("%.7f" % sums)
 
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
@@ -1019,7 +1012,7 @@ def start_bot():
         sums = float(message.text) / float(cost)
 
         temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
         sums = float("%.7f" % sums)
 
         bot.send_message(chat_id=message.chat.id,
@@ -1038,7 +1031,7 @@ def start_bot():
         sums = float("%.7f" % sums)
 
         temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
 
         bot.send_message(chat_id=message.chat.id,
                          text=f'Счёт на оплату создан\n'
@@ -1062,7 +1055,7 @@ def start_bot():
 
             sums = float("%.7f" % sums)
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
@@ -1071,10 +1064,28 @@ def start_bot():
                                   f'Сумма перевода: {sums} DASH\n'
                                   f'После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
-
-
         except:
             pass
+
+    def ok_pay(message):
+        row = func.ok_pays(message.text)
+        for i in row:
+            btn_ok = types.InlineKeyboardMarkup(row_width=3)
+            btn_ok.add(
+                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=i[4]),
+                types.InlineKeyboardButton(text='❌ Отменить', callback_data='not_ok')
+            )
+
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Уникальный код платежа: {i[4]}\n'
+                                  f'Username: {i[0]}\n'
+                                  f'Сумма: {i[1]}\n'
+                                  f'Тип криптовалюты: {i[3]}\n'
+                                  f'Количество валюты: {i[5]}\n',
+                             reply_markup=btn_ok,
+                             )
+            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1])
+            print(ok_pay_dict[i[4]].username)
 
     @bot.message_handler(content_types=['document'])
     def download_product_4(message):

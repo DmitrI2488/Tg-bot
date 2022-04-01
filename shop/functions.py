@@ -40,6 +40,14 @@ class DownloadProduct:
         self.name_product = None
 
 
+class ok:
+    def __init__(self, code, chat_id, username, sum):
+        self.code = code
+        self.chat_id = chat_id
+        self.username = username
+        self.sum = sum
+
+
 class GiveBalance:
     def __init__(self, login):
         self.login = login
@@ -196,13 +204,15 @@ def add_product_to_section(name_product, price, name_section, info, name):
     conn.close()
 
 
-def create_pay(username, sum, valute, code, crypt):
+def create_pay(username, sum, valute, code, crypt, chat_id):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
 
     i_pays = 0
+    status = 0
 
-    cursor.execute(f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}")')
+    cursor.execute(
+        f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}", "{status}", "{chat_id}")')
     conn.commit()
 
     cursor.close()
@@ -220,8 +230,6 @@ def i_pay(code):
 
     cursor.close()
     conn.close()
-
-
 
 
 # Admin menu - del_product_to_section
@@ -552,3 +560,19 @@ def get_id(username):
     cursor.execute(f'SELECT user_id FROM users WHERE name = "{username}"')
     user = cursor.fetchone()
     return user[0]
+
+
+def ok_pays(username):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT * FROM replenishment WHERE username = "{username}" AND status = 0')
+    row = cursor.fetchall()
+    return row
+
+
+def agree(username, sum):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(f'UPDATE users SET balance = {sum} WHERE name = "{username}"')
+    row = cursor.fetchall()
+    return row

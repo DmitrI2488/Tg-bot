@@ -16,7 +16,7 @@ main_menu.add(
 
 i_buy_cr = types.InlineKeyboardMarkup(row_width=1)
 i_buy_cr.add(
-    types.InlineKeyboardButton(text='Я приобрел', callback_data='crypto'),
+    types.InlineKeyboardButton(text='✅Я приобрел', callback_data='crypto'),
     types.InlineKeyboardButton(text='Назад', callback_data='replenishment2'),
 )
 # f'Bitcoin|BTC\n'
@@ -39,10 +39,17 @@ crypto.add(
 
 replenishments = types.InlineKeyboardMarkup(row_width=1)
 replenishments.add(
-    types.InlineKeyboardButton(text='У меня есть криптовалюта', callback_data='crypto'),
+    types.InlineKeyboardButton(text='✅У меня есть криптовалюта', callback_data='crypto'),
     types.InlineKeyboardButton(text='У меня нет криптовалюты', callback_data='no_crypto'),
     types.InlineKeyboardButton(text='Назад', callback_data='main'),
 )
+
+ok_pay = types.InlineKeyboardMarkup(row_width=1)
+ok_pay.add(
+    types.InlineKeyboardButton(text='Подтвердить', callback_data='crypto'),
+    types.InlineKeyboardButton(text='Назад', callback_data='replenishment'),
+)
+
 
 no_crypto_back = types.InlineKeyboardMarkup(row_width=1)
 no_crypto_back.add(
@@ -64,8 +71,9 @@ admin_menu.add(types.InlineKeyboardButton(text='Управление товар�
 admin_menu.add(types.InlineKeyboardButton(text='Изменить баланс', callback_data='give_balance'))
 admin_menu.add(types.InlineKeyboardButton(text='Рассылка', callback_data='admin_sending_messages'))
 admin_menu.add(types.InlineKeyboardButton(text='Топ рефералов(доходы)', callback_data='admin_top_ref'))
+admin_menu.add(types.InlineKeyboardButton(text='Подтвердить платеж', callback_data='ok_pay'))
 admin_menu.add(
-    types.InlineKeyboardButton(text='Информаци', callback_data='admin_info'),
+    types.InlineKeyboardButton(text='Информация', callback_data='admin_info'),
     types.InlineKeyboardButton(text='Выйти', callback_data='exit_admin_menu')
 )
 
@@ -101,7 +109,8 @@ btn_purchase.add(
 
 btn_ok = types.InlineKeyboardMarkup(row_width=3)
 btn_ok.add(
-    types.InlineKeyboardButton(text='Понял', callback_data='btn_ok')
+    types.InlineKeyboardButton(text='✅Подтвердить', callback_data='ok'),
+    types.InlineKeyboardButton(text='❌ Отменить', callback_data='not_ok')
 )
 
 replenish_balance = types.InlineKeyboardMarkup(row_width=3)
