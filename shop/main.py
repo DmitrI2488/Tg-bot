@@ -476,15 +476,23 @@ def start_bot():
             )
 
         if call.data.isdigit():
-            func.agree(ok_pay_dict[int(call.data)].username, ok_pay_dict[int(call.data)].sum)
-            bot.send_message(
-                chat_id=chat_id,
-                text='Платеж подтвержден',
-            )
-            bot.send_message(
-                chat_id=ok_pay_dict[int(call.data)].chat_id,
-                text=f'✅Пополнение на сумму {ok_pay_dict[int(call.data)].sum} прошло успешно'
-            )
+            if 99 < int(call.data) < 1000:
+                func.agree(ok_pay_dict[int(call.data)].username, ok_pay_dict[int(call.data)].sum, ok_pay_dict[int(call.data)].code)
+                bot.send_message(
+                    chat_id=chat_id,
+                    text='Платеж подтвержден',
+                )
+                bot.send_message(
+                    chat_id=ok_pay_dict[int(call.data)].chat_id,
+                    text=f'✅Пополнение на сумму {ok_pay_dict[int(call.data)].sum} прошло успешно'
+                )
+            if 1099 < int(call.data) < 2000:
+                temp = int(call.data) - 1000
+                func.disagree(ok_pay_dict[int(temp)].username, ok_pay_dict[int(temp)].code)
+                bot.send_message(
+                    chat_id=chat_id,
+                    text='Платеж отменен',
+                )
 
     def give_balance(message):
         try:
@@ -999,7 +1007,7 @@ def start_bot():
             ur = ur.get('Value')
             sums = float(message.text) / float(cost) / float(ur)
             sums = float("%.7f" % sums)
-            replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
+            replenishment_dict[message.chat.id] = func.replenishment("BNB", message.from_user.username, message.text,
                                                                      sums)
             temp = replenishment_dict[message.chat.id]
             func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
@@ -1021,7 +1029,7 @@ def start_bot():
         btc_rur = response.get('usdt_rur')
         cost = btc_rur.get('sell')
         sums = float(message.text) / float(cost)
-        replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
+        replenishment_dict[message.chat.id] = func.replenishment("USDT", message.from_user.username, message.text,
                                                                  sums)
 
         temp = replenishment_dict[message.chat.id]
@@ -1042,7 +1050,7 @@ def start_bot():
         cost = btc_rur.get('sell')
         sums = float(message.text) / float(cost)
         sums = float("%.7f" % sums)
-        replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
+        replenishment_dict[message.chat.id] = func.replenishment("USDC", message.from_user.username, message.text,
                                                                  sums)
 
         temp = replenishment_dict[message.chat.id]
@@ -1090,10 +1098,9 @@ def start_bot():
         for i in row:
             btn_ok = types.InlineKeyboardMarkup(row_width=3)
             btn_ok.add(
-                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=i[4]),
-                types.InlineKeyboardButton(text='❌ Отменить', callback_data='not_ok')
+                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
+                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4]+1000))
             )
-
             bot.send_message(chat_id=message.chat.id,
                              text=f'Уникальный код платежа: {i[4]}\n'
                                   f'Username: {i[0]}\n'

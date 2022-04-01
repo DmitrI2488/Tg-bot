@@ -570,10 +570,27 @@ def ok_pays(username):
     return row
 
 
-def agree(username, sum):
+def agree(username, sum, code):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
     cursor.execute(f'UPDATE users SET balance = balance + {sum} WHERE name = "{username}"')
     conn.commit()
-    cursor.execute(f'UPDATE replenishment SET status = "1" WHERE username = "{username}"')
+    cursor.execute(f'UPDATE replenishment SET status = "1" WHERE username = "{username}" AND code = "{code}"')
     conn.commit()
+
+
+def disagree(username, code):
+    conn = sqlite3.connect('base_ts.sqlite')
+    cursor = conn.cursor()
+
+    cursor.execute(f'DELETE FROM replenishment WHERE user_id = "{username}" AND code = "{code}"')
+    conn.commit()
+
+
+def check_id(username):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT code FROM replenishment WHERE username = "{username}"')
+    user = cursor.fetchmany()
+
+    return user
