@@ -20,6 +20,7 @@ product_dict = {}
 download_dict = {}
 balance_dict = {}
 admin_sending_messages_dict = {}
+replenishment_dict = {}
 
 
 def start_bot():
@@ -102,7 +103,6 @@ def start_bot():
 
         if call.data == 'buy':
             try:
-                print(34)
                 product = product_dict[chat_id]
 
                 code = random.randint(111, 999)
@@ -222,31 +222,37 @@ def start_bot():
         if call.data == 'BTC':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, btc)
 
         if call.data == 'XMR':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, xmr)
 
         if call.data == 'BNB':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, bnb)
 
         if call.data == 'USDC':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, usdc)
 
         if call.data == 'USDT':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, usdt)
 
         if call.data == 'DASH':
             msg = bot.send_message(chat_id=chat_id,
                                    text=f'Укажите какую сумму в рублях, хотите пополнить')
+            replenishment_dict[chat_id] = func.replenishment(call.data)
             bot.register_next_step_handler(msg, dash)
         # Admin menu
         if call.data == 'admin_info':
@@ -379,6 +385,16 @@ def start_bot():
                                   message_id=message_id,
                                   text=func.replenish_balance(chat_id),
                                   reply_markup=menu.replenish_balance)
+
+        if call.data == 'i_pay':
+            repl = replenishment_dict[chat_id]
+            func.i_pay(repl.code)
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=message_id,
+                                  text=f'Отправьте на аккаунт @test чек покупки\n'
+                                       f'Как только платеж подтвердят деньги будут зачислены на ваш баланс',
+                                  reply_markup=menu.main_menu)
+
 
         if call.data == 'cancel_payment':
             func.cancel_payment(chat_id)
@@ -916,20 +932,19 @@ def start_bot():
 
     def btc(message):
         try:
-            msg = message.text
-            print(msg)
             response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=BTCBUSD').json()
             cost = response.get('price')
             rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
             usd = rub.get('Valute')
             ur = usd.get('USD')
             ur = ur.get('Value')
-            print(ur)
-            print(cost)
-            sums = float(message.text) / float(cost)
-            sums = sums / float(ur)
-            print(sums)
-            print(msg)
+
+            sums = float(message.text) / float(cost) / float(ur)
+            sums = float("%.7f" % sums)
+
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
                                   f'Произведите перевод на адрес:\n'
@@ -939,25 +954,26 @@ def start_bot():
                              reply_markup=menu.btc)
 
 
+
         except:
             pass
 
     def xmr(message):
         try:
-            msg = message.text
-            print(msg)
             response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=XMRUSDT').json()
             cost = response.get('price')
             rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
             usd = rub.get('Valute')
             ur = usd.get('USD')
             ur = ur.get('Value')
-            print(ur)
-            print(cost)
-            sums = float(message.text) / float(cost)
-            sums = sums / float(ur)
-            print(sums)
-            print(msg)
+
+            sums = float(message.text) / float(cost) / float(ur)
+
+            sums = float("%.7f" % sums)
+
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
                                   f'Произведите перевод на адрес:\n'
@@ -972,20 +988,18 @@ def start_bot():
 
     def bnb(message):
         try:
-            msg = message.text
-            print(msg)
             response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=BNBBUSD').json()
             cost = response.get('price')
             rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
             usd = rub.get('Valute')
             ur = usd.get('USD')
             ur = ur.get('Value')
-            print(ur)
-            print(cost)
-            sums = float(message.text) / float(cost)
-            sums = sums / float(ur)
-            print(sums)
-            print(msg)
+            sums = float(message.text) / float(cost) / float(ur)
+            sums = float("%.7f" % sums)
+
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
                                   f'Произведите перевод на адрес:\n'
@@ -1003,6 +1017,11 @@ def start_bot():
         btc_rur = response.get('usdt_rur')
         cost = btc_rur.get('sell')
         sums = float(message.text) / float(cost)
+
+        temp = replenishment_dict[message.chat.id]
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+        sums = float("%.7f" % sums)
+
         bot.send_message(chat_id=message.chat.id,
                          text=f'Счёт на оплату создан\n'
                               f'Произведите перевод на адрес:\n'
@@ -1016,6 +1035,11 @@ def start_bot():
         btc_rur = response.get('usdc_rur')
         cost = btc_rur.get('sell')
         sums = float(message.text) / float(cost)
+        sums = float("%.7f" % sums)
+
+        temp = replenishment_dict[message.chat.id]
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+
         bot.send_message(chat_id=message.chat.id,
                          text=f'Счёт на оплату создан\n'
                               f'Произведите перевод на адрес:\n'
@@ -1026,20 +1050,20 @@ def start_bot():
 
     def dash(message):
         try:
-            msg = message.text
-            print(msg)
+
             response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=DASHUSDT').json()
             cost = response.get('price')
             rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
             usd = rub.get('Valute')
             ur = usd.get('USD')
             ur = ur.get('Value')
-            print(ur)
-            print(cost)
-            sums = float(message.text) / float(cost)
-            sums = sums / float(ur)
-            print(sums)
-            print(msg)
+
+            sums = float(message.text) / float(cost) / float(ur)
+
+            sums = float("%.7f" % sums)
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums)
+
             bot.send_message(chat_id=message.chat.id,
                              text=f'Счёт на оплату создан\n'
                                   f'Произведите перевод на адрес:\n'

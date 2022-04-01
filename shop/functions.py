@@ -54,6 +54,16 @@ class Admin_sending_messages:
         self.text = None
 
 
+class replenishment:
+    def __init__(self, valute):
+        self.username = None
+        self.sum = None
+        self.i_pay = 0
+        self.valute = valute
+        self.code = random.randint(111, 999)
+        self.crypt = None
+
+
 # Menu catalog
 def menu_catalog():
     conn = sqlite3.connect("base_ts.sqlite")
@@ -184,6 +194,34 @@ def add_product_to_section(name_product, price, name_section, info, name):
     # Close connection
     cursor.close()
     conn.close()
+
+
+def create_pay(username, sum, valute, code, crypt):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+
+    i_pays = 0
+
+    cursor.execute(f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}")')
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+def i_pay(code):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+
+    i_pays = 1
+
+    cursor.execute(f'UPDATE replenishment SET i_pay = "{i_pays}" WHERE code = "{code}"')
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
 
 
 # Admin menu - del_product_to_section
