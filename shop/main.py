@@ -23,6 +23,7 @@ admin_sending_messages_dict = {}
 replenishment_dict = {}
 ok_pay_dict = {}
 
+
 def start_bot():
     bot = telebot.TeleBot(settings.bot_token)
 
@@ -386,24 +387,39 @@ def start_bot():
             func.i_pay(repl.code)
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=message_id,
-                                  text=f'❗❗❗ Отправьте на аккаунт @test чек покупки❗❗❗\n'
+                                  text=f'❗❗❗ Отправьте на аккаунт @test чек пополнения❗❗❗\n'
                                        f'✅ Как только платеж подтвердят деньги будут зачислены на ваш баланс ',
                                   reply_markup=menu.main_menu)
             bot.send_message(
                 chat_id=settings.CHANNEL_ID2,
-                text=f'Пользователь подтвердил {repl.username} оплату\n'
-                     f'На сумму: {repl.sum}\n'
-                     f'Валюта: {repl.valute}\n'
-                     f'Уникальный код платежа: {repl.code}\n'
-                     f'Сумма в валюте: {repl.crypt}\n'
-                     f'Проверьте личные сообщения и подтвердите платеж, если он верен'
+                text=f'👤 Пользователь @{repl.username} подтвердил оплату\n'
+                     f'❗ Если username None, для подтверждения используйте id: {repl.id}\n'
+                     f'💰 На сумму: {repl.sum}р.\n'
+                     f'💱 Валюта: {repl.valute}\n'
+                     f'🔐 Уникальный код платежа: {repl.code}\n'
+                     f'💵 Сумма в валюте: {repl.crypt}\n'
+                     f'‼️ Проверьте личные сообщения и подтвердите платеж, если он верен ‼️'
             )
 
         if call.data == 'ok_pay':
-            msg = bot.send_message(chat_id=call.message.chat.id,
-                                   text=f'Введите username пользователя с @\n'
-                                        f'Платежи которого вы хотите проверить')
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=message_id,
+                                  text=f'Выберите метод подтверждения\n',
+                                  reply_markup=menu.met_ch)
+
+        if call.data == 'u_name':
+            msg = bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=message_id,
+                                        text=f'Введите username пользователя с @\n'
+                                             f'Платежи которого вы хотите проверить')
             bot.register_next_step_handler(msg, ok_pay)
+
+        if call.data == 'u_id':
+            msg = bot.edit_message_text(chat_id=call.message.chat.id,
+                                        message_id=message_id,
+                                        text=f'Введите userid пользователя\n'
+                                             f'Платежи которого вы хотите проверить')
+            bot.register_next_step_handler(msg, ok_pay2)
 
         if call.data == 'cancel_payment':
             func.cancel_payment(chat_id)
@@ -477,7 +493,8 @@ def start_bot():
 
         if call.data.isdigit():
             if 99 < int(call.data) < 1000:
-                func.agree(ok_pay_dict[int(call.data)].username, ok_pay_dict[int(call.data)].sum, ok_pay_dict[int(call.data)].code)
+                func.agree(ok_pay_dict[int(call.data)].u_id, ok_pay_dict[int(call.data)].sum,
+                           ok_pay_dict[int(call.data)].code)
                 bot.send_message(
                     chat_id=chat_id,
                     text='Платеж подтвержден',
@@ -488,7 +505,7 @@ def start_bot():
                 )
             if 1099 < int(call.data) < 2000:
                 temp = int(call.data) - 1000
-                func.disagree(ok_pay_dict[int(temp)].username, ok_pay_dict[int(temp)].code)
+                func.disagree(ok_pay_dict[int(temp)].u_id, ok_pay_dict[int(temp)].code)
                 bot.send_message(
                     chat_id=chat_id,
                     text='Платеж отменен',
@@ -950,10 +967,12 @@ def start_bot():
 
             sums = float(message.text) / float(cost) / float(ur)
             sums = float("%.7f" % sums)
+
             replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
-                                                                     sums)
+                                                                     sums, message.from_user.id)
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                            message.from_user.id)
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
@@ -980,16 +999,17 @@ def start_bot():
 
             sums = float("%.7f" % sums)
             replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
-                                                                     sums)
+                                                                     sums, message.from_user.id)
 
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                            message.from_user.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                                  f'💲 Сумма перевода: {sums} BTC\n'
+                                  f'💲 Сумма перевода: {sums} XMR\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
 
@@ -1008,15 +1028,16 @@ def start_bot():
             sums = float(message.text) / float(cost) / float(ur)
             sums = float("%.7f" % sums)
             replenishment_dict[message.chat.id] = func.replenishment("BNB", message.from_user.username, message.text,
-                                                                     sums)
+                                                                     sums, message.from_user.id)
             temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                            message.from_user.id)
 
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                                  f'💲 Сумма перевода: {sums} BTC\n'
+                                  f'💲 Сумма перевода: {sums} BNB\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
 
@@ -1030,17 +1051,18 @@ def start_bot():
         cost = btc_rur.get('sell')
         sums = float(message.text) / float(cost)
         replenishment_dict[message.chat.id] = func.replenishment("USDT", message.from_user.username, message.text,
-                                                                 sums)
+                                                                 sums, message.from_user.id)
 
         temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                        message.from_user.id)
         sums = float("%.7f" % sums)
 
         bot.send_message(chat_id=message.chat.id,
                          text=f'🧾 Счёт на оплату создан\n'
                               f'💵 Произведите перевод на адрес:\n'
                               f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                              f'💲 Сумма перевода: {sums} BTC\n'
+                              f'💲 Сумма перевода: {sums} USDT\n'
                               f'✅ После оплаты нажмите: Я оплатил',
                          reply_markup=menu.btc)
 
@@ -1051,16 +1073,17 @@ def start_bot():
         sums = float(message.text) / float(cost)
         sums = float("%.7f" % sums)
         replenishment_dict[message.chat.id] = func.replenishment("USDC", message.from_user.username, message.text,
-                                                                 sums)
+                                                                 sums, message.from_user.id)
 
         temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                        message.from_user.id)
 
         bot.send_message(chat_id=message.chat.id,
                          text=f'🧾 Счёт на оплату создан\n'
                               f'💵 Произведите перевод на адрес:\n'
                               f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                              f'💲 Сумма перевода: {sums} BTC\n'
+                              f'💲 Сумма перевода: {sums} USDC\n'
                               f'✅ После оплаты нажмите: Я оплатил',
                          reply_markup=menu.btc)
 
@@ -1074,7 +1097,6 @@ def start_bot():
             ur = usd.get('USD')
             ur = ur.get('Value')
 
-
             sums = float(message.text) / float(cost) / float(ur)
 
             sums = float("%.7f" % sums)
@@ -1087,7 +1109,7 @@ def start_bot():
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                                  f'💲 Сумма перевода: {sums} BTC\n'
+                                  f'💲 Сумма перевода: {sums} DASH\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
         except:
@@ -1099,7 +1121,7 @@ def start_bot():
             btn_ok = types.InlineKeyboardMarkup(row_width=3)
             btn_ok.add(
                 types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
-                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4]+1000))
+                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
             )
             bot.send_message(chat_id=message.chat.id,
                              text=f'Уникальный код платежа: {i[4]}\n'
@@ -1109,7 +1131,25 @@ def start_bot():
                                   f'Количество валюты: {i[5]}\n',
                              reply_markup=btn_ok,
                              )
-            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1])
+            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
+
+    def ok_pay2(message):
+        row = func.ok_pays2(message.text)
+        for i in row:
+            btn_ok = types.InlineKeyboardMarkup(row_width=3)
+            btn_ok.add(
+                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
+                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
+            )
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'Уникальный код платежа: {i[4]}\n'
+                                  f'Username: {i[0]}\n'
+                                  f'Сумма: {i[1]}\n'
+                                  f'Тип криптовалюты: {i[3]}\n'
+                                  f'Количество валюты: {i[5]}\n',
+                             reply_markup=btn_ok,
+                             )
+            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
 
     @bot.message_handler(content_types=['document'])
     def download_product_4(message):

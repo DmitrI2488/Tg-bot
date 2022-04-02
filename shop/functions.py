@@ -41,11 +41,12 @@ class DownloadProduct:
 
 
 class ok:
-    def __init__(self, code, chat_id, username, sum):
+    def __init__(self, code, chat_id, username, sum, u_id):
         self.code = code
         self.chat_id = chat_id
         self.username = username
         self.sum = sum
+        self.u_id = u_id
 
 
 class GiveBalance:
@@ -63,13 +64,14 @@ class Admin_sending_messages:
 
 
 class replenishment:
-    def __init__(self, valute, username, sums, crypt):
+    def __init__(self, valute, username, sums, crypt, ids):
         self.username = username
         self.sum = sums
         self.i_pay = 0
         self.valute = valute
         self.code = random.randint(111, 999)
         self.crypt = crypt
+        self.id = ids
 
 
 # Menu catalog
@@ -204,7 +206,7 @@ def add_product_to_section(name_product, price, name_section, info, name):
     conn.close()
 
 
-def create_pay(username, sum, valute, code, crypt, chat_id):
+def create_pay(username, sum, valute, code, crypt, chat_id, user_id):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
 
@@ -212,7 +214,7 @@ def create_pay(username, sum, valute, code, crypt, chat_id):
     status = 0
     username = f'@{username}'
     cursor.execute(
-        f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}", "{status}", "{chat_id}")')
+        f'INSERT INTO "replenishment" VALUES ("{username}", "{sum}", "{i_pays}", "{valute}", "{code}", "{crypt}", "{status}", "{chat_id}", "{user_id}")')
     conn.commit()
 
     cursor.close()
@@ -570,12 +572,20 @@ def ok_pays(username):
     return row
 
 
+def ok_pays2(username):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT * FROM replenishment WHERE user_id = "{username}" AND status = 0')
+    row = cursor.fetchall()
+    return row
+
+
 def agree(username, sum, code):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
-    cursor.execute(f'UPDATE users SET balance = balance + {sum} WHERE name = "{username}"')
+    cursor.execute(f'UPDATE users SET balance = balance + {sum} WHERE user_id = "{username}"')
     conn.commit()
-    cursor.execute(f'UPDATE replenishment SET status = "1" WHERE username = "{username}" AND code = "{code}"')
+    cursor.execute(f'UPDATE replenishment SET status = "1" WHERE user_id = "{username}" AND code = "{code}"')
     conn.commit()
 
 

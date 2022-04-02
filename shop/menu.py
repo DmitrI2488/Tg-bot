@@ -125,5 +125,11 @@ to_close.add(
 )
 
 
+met_ch = types.InlineKeyboardMarkup(row_width=1)
+met_ch.add(
+    types.InlineKeyboardButton(text='Проверить через @username', callback_data='u_name'),
+    types.InlineKeyboardButton(text='Проверить через user_id', callback_data='u_id'),
+)
+
 
 
