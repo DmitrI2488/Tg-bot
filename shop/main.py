@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
-from telebot.types import InlineKeyboardButton
-
 import menu
 import settings
 import functions as func
@@ -12,7 +10,6 @@ from telebot import types
 import time
 import datetime
 import random
-import json
 import requests
 
 catalog_dict = {}
@@ -248,10 +245,10 @@ def start_bot():
                                    text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, usdt)
 
-        if call.data == 'DASH':
-            msg = bot.send_message(chat_id=chat_id,
-                                   text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
-            bot.register_next_step_handler(msg, dash)
+        # if call.data == 'DASH':
+        #     msg = bot.send_message(chat_id=chat_id,
+        #                            text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
+        #     bot.register_next_step_handler(msg, dash)
         # Admin menu
         if call.data == 'admin_info':
             bot.edit_message_text(
@@ -585,12 +582,15 @@ def start_bot():
                 if check == 1:
                     lists = func.buy(product)
                     bot.send_message(chat_id=message.chat.id,
-                                     text=f'✅ Вы успешно купили товар\n\n{lists}',
+                                     text=f'✅ Вы успешно купили товар, спасибо\n\n'
+                                          f'{lists}\n'
+                                          f'В ближайшее время с вами свяжутся\n'
+                                          f'Если у вас не указан username, напишите на аккаунт @Igcventure',
                                      reply_markup=menu.main_menu)
                     info = func.profile(message.chat.id)
                     bot.send_message(chat_id=settings.admin_id,
                                      text=f'✅ Куплен товар\n\n'
-                                          f'❕ Купил - @{info[1]}\n'
+                                          f'❕ Купил - {info[1]}\n'
                                           f'❕ Сумма покупки - {float(product.price)}\n'
                                           f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                           f'❕ Купленный товар ⬇️\n\n{lists}')
@@ -598,7 +598,7 @@ def start_bot():
                     try:
                         bot.send_message(chat_id=f'{settings.CHANNEL_ID}',
                                          text=f'✅ Куплен товар\n\n'
-                                              f'❕ Купил - @{info[1]}\n'
+                                              f'❕ Купил - {info[1]}\n'
                                               f'❕ Сумма покупки - {float(product.price)}\n'
                                               f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                               f'❕ Купленный товар ⬇️\n\n{lists}')
@@ -994,7 +994,7 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'⚠️ Временно отсутствует\n'
                                   f'💲 Сумма перевода: {sums} BTC\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
@@ -1056,6 +1056,8 @@ def start_bot():
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ 0xC3878fe1796210054191448FCF7F4E53710CdD1f\n'
+                                  f'⚠ Поддерживаемые сети:\n'
+                                  f'BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} BNB\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
@@ -1082,7 +1084,9 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'⚠️ 0xC3878fe1796210054191448FCF7F4E53710CdD1f\n'
+                                  f'⚠ Поддерживаемые сети:\n'
+                                  f' BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} USDT\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
@@ -1109,7 +1113,9 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'⚠️ 0xC3878fe1796210054191448FCF7F4E53710CdD1f\n'
+                                  f'⚠ Поддерживаемые сети:\n'
+                                  f'BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} USDC\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
@@ -1119,36 +1125,36 @@ def start_bot():
                                   f'Возможно введенные данные не корректны',
                              reply_markup=menu.main_menu)
 
-    def dash(message):
-        try:
-
-            response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=DASHUSDT').json()
-            cost = response.get('price')
-            rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
-            usd = rub.get('Valute')
-            ur = usd.get('USD')
-            ur = ur.get('Value')
-
-            sums = float(message.text) / float(cost) / float(ur)
-
-            sums = float("%.7f" % sums)
-            replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
-                                                                     sums)
-            temp = replenishment_dict[message.chat.id]
-            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
-
-            bot.send_message(chat_id=message.chat.id,
-                             text=f'🧾 Счёт на оплату создан\n'
-                                  f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                                  f'💲 Сумма перевода: {sums} DASH\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
-                             reply_markup=menu.btc)
-        except Exception as e:
-            bot.send_message(chat_id=message.chat.id,
-                             text=f'⚠️ Что-то пошло не по плану\n'
-                                  f'Возможно введенные данные не корректны',
-                             reply_markup=menu.main_menu)
+    # def dash(message):
+    #     try:
+    #
+    #         response = requests.get(url='https://www.binance.com/fapi/v1/ticker/price?symbol=DASHUSDT').json()
+    #         cost = response.get('price')
+    #         rub = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+    #         usd = rub.get('Valute')
+    #         ur = usd.get('USD')
+    #         ur = ur.get('Value')
+    #
+    #         sums = float(message.text) / float(cost) / float(ur)
+    #
+    #         sums = float("%.7f" % sums)
+    #         replenishment_dict[message.chat.id] = func.replenishment("BTC", message.from_user.username, message.text,
+    #                                                                  sums)
+    #         temp = replenishment_dict[message.chat.id]
+    #         func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id)
+    #
+    #         bot.send_message(chat_id=message.chat.id,
+    #                          text=f'🧾 Счёт на оплату создан\n'
+    #                               f'💵 Произведите перевод на адрес:\n'
+    #                               f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+    #                               f'💲 Сумма перевода: {sums} DASH\n'
+    #                               f'✅ После оплаты нажмите: Я оплатил',
+    #                          reply_markup=menu.btc)
+    #     except Exception as e:
+    #         bot.send_message(chat_id=message.chat.id,
+    #                          text=f'⚠️ Что-то пошло не по плану\n'
+    #                               f'Возможно введенные данные не корректны',
+    #                          reply_markup=menu.main_menu)
 
     def ok_pay(message):
         try:
