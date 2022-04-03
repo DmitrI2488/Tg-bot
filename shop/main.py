@@ -164,9 +164,10 @@ def start_bot():
 
         if call.data == 'replenishment':
             try:
-                bot.send_message(chat_id=chat_id,
-                                 text='Выберите подходящий вам способ',
-                                 reply_markup=menu.replenishments)
+                bot.edit_message_text(chat_id=chat_id,
+                                      message_id=message_id,
+                                      text='Выберите подходящий вам способ',
+                                      reply_markup=menu.replenishments)
 
 
 
@@ -216,9 +217,10 @@ def start_bot():
 
                                   )
         if call.data == 'main':
-            bot.send_message(chat_id,
-                             f'Добро пожаловать!',
-                             reply_markup=menu.main_menu)
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text=f'Добро пожаловать!',
+                                  reply_markup=menu.main_menu)
 
         if call.data == 'BTC':
             msg = bot.send_message(chat_id=chat_id,
