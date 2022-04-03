@@ -1055,7 +1055,7 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'⚠️ 0xC3878fe1796210054191448FCF7F4E53710CdD1f\n'
                                   f'💲 Сумма перевода: {sums} BNB\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
