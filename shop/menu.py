@@ -10,13 +10,13 @@ main_menu.add(
     types.InlineKeyboardButton(text='🛒 Мои покупки', callback_data='purchases'),
     types.InlineKeyboardButton(text='💸 Пополнить баланс', callback_data='replenishment'),
 )
-main_menu.add(
-    types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
-)
+# main_menu.add(
+#     types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
+# )
 
 i_buy_cr = types.InlineKeyboardMarkup(row_width=1)
 i_buy_cr.add(
-    types.InlineKeyboardButton(text='✅ Я приобрел', callback_data='crypto'),
+    types.InlineKeyboardButton(text='✅ Я приобрел и ознакомился', callback_data='crypto'),
     types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment2'),
 )
 # f'Bitcoin|BTC\n'
@@ -33,7 +33,6 @@ crypto.add(
     types.InlineKeyboardButton(text='💰 Binance coin|BNB', callback_data='BNB'),
     types.InlineKeyboardButton(text='💰 USD Coin|USDC', callback_data='USDC'),
     types.InlineKeyboardButton(text='💰 Tether|USDT', callback_data='USDT'),
-    types.InlineKeyboardButton(text='💰 Dash|DASH', callback_data='DASH'),
     types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment2'),
 )
 
@@ -70,7 +69,7 @@ admin_menu.add(types.InlineKeyboardButton(text='Управление катал�
 admin_menu.add(types.InlineKeyboardButton(text='Управление товаром', callback_data='section_control'))
 admin_menu.add(types.InlineKeyboardButton(text='Изменить баланс', callback_data='give_balance'))
 admin_menu.add(types.InlineKeyboardButton(text='Рассылка', callback_data='admin_sending_messages'))
-admin_menu.add(types.InlineKeyboardButton(text='Топ рефералов(доходы)', callback_data='admin_top_ref'))
+# admin_menu.add(types.InlineKeyboardButton(text='Топ рефералов(доходы)', callback_data='admin_top_ref'))
 admin_menu.add(types.InlineKeyboardButton(text='Подтвердить платеж', callback_data='ok_pay'))
 admin_menu.add(
     types.InlineKeyboardButton(text='ℹ ️Информация', callback_data='admin_info'),

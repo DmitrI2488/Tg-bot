@@ -201,18 +201,20 @@ def start_bot():
         if call.data == 'no_crypto':
             bot.edit_message_text(chat_id=chat_id,
                                   message_id=message_id,
-                                  text=f'Вам необходимо приобрести криптовалюту через @CryptoBot\n'
+                                  text=f'❗ Вам необходимо приобрести криптовалюту через @CryptoBot\n'
                                        f'Обратите внимание, что у нас есть поддержка следующих криптовалют\n'
-                                       f'Bitcoin|BTC\n'
-                                       f'Monero|XMR\n'
-                                       f'Binance coin|BNB\n'
-                                       f'Binance USD|BUSD\n'
-                                       f'USD Coin|USDC\n'
-                                       f'Tether|USDT\n'
-                                       f'Dash|DASH\n'
-                                       f'После приобретения криптовалюты вернитесь в раздел: У меня есть криптовалюта\n'
+                                       f'💰 Bitcoin|BTC\n'
+                                       f'💰 Monero|XMR\n'
+                                       f'💰 Binance coin|BNB\n'
+                                       f'💰 Binance USD|BUSD\n'
+                                       f'💰 USD Coin|USDC\n'
+                                       f'💰 Tether|USDT\n'
+                                       f'✅ После приобретения криптовалюты вернитесь в раздел: У меня есть криптовалюта\n'
                                        f'Выберите нужную вам криптовалюту и произведите перевод\n'
-                                       f'После подтвержения платежа, деньги будут зачислены на ваш счет',
+                                       f'💵 После подтвержения платежа, деньги будут зачислены на ваш счет\n'
+                                       f'❗❗❗ Обратите внимание, что при переводе денег,'
+                                       f'не стоит закрывать окно с суммой перевода, так как она автоматически меняется'
+                                       f'в зависимости от курса на бирже ❗❗❗',
                                   reply_markup=menu.i_buy_cr,
 
                                   )
@@ -495,6 +497,7 @@ def start_bot():
             if 99 < int(call.data) < 1000:
                 func.agree(ok_pay_dict[int(call.data)].u_id, ok_pay_dict[int(call.data)].sum,
                            ok_pay_dict[int(call.data)].code)
+                bot.delete_message(call.message.chat.id, call.message.message_id)
                 bot.send_message(
                     chat_id=chat_id,
                     text='Платеж подтвержден',
@@ -505,6 +508,7 @@ def start_bot():
                 )
             if 1099 < int(call.data) < 2000:
                 temp = int(call.data) - 1000
+                bot.delete_message(call.message.chat.id, call.message.message_id)
                 func.disagree(ok_pay_dict[int(temp)].u_id, ok_pay_dict[int(temp)].code)
                 bot.send_message(
                     chat_id=chat_id,
@@ -599,8 +603,11 @@ def start_bot():
                                               f'❕ Дата покупки - {datetime.datetime.now()}\n'
                                               f'❕ Купленный товар ⬇️\n\n{lists}')
 
-                    except:
-                        pass
+
+                    except Exception as e:
+                        bot.send_message(chat_id=message.chat.id,
+                                         text='⚠️ Что-то пошло не по плану',
+                                         reply_markup=menu.main_menu)
 
                 if check == 0:
                     bot.send_message(chat_id=message.chat.id,
@@ -627,7 +634,9 @@ def start_bot():
                     reply_markup=menu.admin_menu
                 )
         except Exception as e:
-            print(e)
+            bot.send_message(chat_id=message.chat.id,
+                             text='⚠️ Что-то пошло не по плану',
+                             reply_markup=menu.main_menu)
 
     def del_section(message):
         try:
@@ -796,7 +805,6 @@ def start_bot():
                                         f'{text}')
             bot.register_next_step_handler(msg, del_product_2)
         except Exception as e:
-            print(e)
             bot.send_message(chat_id=message.chat.id,
                              text='Упсс, что-то пошло не по плану')
 
@@ -928,33 +936,43 @@ def start_bot():
                              text='Упсс, что-то пошло не по плану')
 
     def admin_sending_messages(message):
-        dict = func.Admin_sending_messages(message.chat.id)
-        admin_sending_messages_dict[message.chat.id] = dict
+        try:
+            dict = func.Admin_sending_messages(message.chat.id)
+            admin_sending_messages_dict[message.chat.id] = dict
 
-        dict = admin_sending_messages_dict[message.chat.id]
-        dict.text = message.text
+            dict = admin_sending_messages_dict[message.chat.id]
+            dict.text = message.text
 
-        msg = bot.send_message(message.chat.id,
-                               text='Отправьте "ПОДТВЕРДИТЬ" для подтверждения')
-        bot.register_next_step_handler(msg, admin_sending_messages_2)
+            msg = bot.send_message(message.chat.id,
+                                   text='Отправьте "ПОДТВЕРДИТЬ" для подтверждения')
+            bot.register_next_step_handler(msg, admin_sending_messages_2)
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text='⚠ Что-то пошло не по плану',
+                             reply_markup=menu.main_menu)
 
     def admin_sending_messages_2(message):
-        conn = sqlite3.connect('base_ts.sqlite')
-        cursor = conn.cursor()
-        dict = admin_sending_messages_dict[message.chat.id]
-        if message.text == 'ПОДТВЕРДИТЬ':
-            cursor.execute(f'SELECT * FROM users')
-            row = cursor.fetchall()
+        try:
+            conn = sqlite3.connect('base_ts.sqlite')
+            cursor = conn.cursor()
+            dict = admin_sending_messages_dict[message.chat.id]
+            if message.text == 'ПОДТВЕРДИТЬ':
+                cursor.execute(f'SELECT * FROM users')
+                row = cursor.fetchall()
 
-            for i in range(len(row)):
-                try:
-                    time.sleep(1)
-                    bot.send_message(row[i][0], dict.text)
+                for i in range(len(row)):
+                    try:
+                        time.sleep(1)
+                        bot.send_message(row[i][0], dict.text)
 
-                except:
-                    pass
-        else:
-            bot.send_message(message.chat.id, text='Рассылка отменена')
+                    except:
+                        pass
+            else:
+                bot.send_message(message.chat.id, text='Рассылка отменена')
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text='⚠️ Что-то пошло не по плану',
+                             reply_markup=menu.main_menu)
 
     def btc(message):
         try:
@@ -980,11 +998,11 @@ def start_bot():
                                   f'💲 Сумма перевода: {sums} BTC\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
-
-
-
-        except:
-            pass
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def xmr(message):
         try:
@@ -1008,14 +1026,15 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'⚠️ 4B8QbrEc2fa61umDsRycJxC2gKVT79Yw4EQNUSAbt4RDdHGTHiN99UjBE4HuPWV2EScGmgBfJ29bWAWEVCynvduHALG5pmd\n'
                                   f'💲 Сумма перевода: {sums} XMR\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
-
-
-        except:
-            pass
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def bnb(message):
         try:
@@ -1040,52 +1059,65 @@ def start_bot():
                                   f'💲 Сумма перевода: {sums} BNB\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
-
-
-        except:
-            pass
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def usdt(message):
-        response = requests.get(url='https://yobit.net/api/3/ticker/usdt_rur').json()
-        btc_rur = response.get('usdt_rur')
-        cost = btc_rur.get('sell')
-        sums = float(message.text) / float(cost)
-        replenishment_dict[message.chat.id] = func.replenishment("USDT", message.from_user.username, message.text,
-                                                                 sums, message.from_user.id)
+        try:
+            response = requests.get(url='https://yobit.net/api/3/ticker/usdt_rur').json()
+            btc_rur = response.get('usdt_rur')
+            cost = btc_rur.get('sell')
+            sums = float(message.text) / float(cost)
+            replenishment_dict[message.chat.id] = func.replenishment("USDT", message.from_user.username, message.text,
+                                                                     sums, message.from_user.id)
 
-        temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
-                        message.from_user.id)
-        sums = float("%.7f" % sums)
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                            message.from_user.id)
+            sums = float("%.7f" % sums)
 
-        bot.send_message(chat_id=message.chat.id,
-                         text=f'🧾 Счёт на оплату создан\n'
-                              f'💵 Произведите перевод на адрес:\n'
-                              f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                              f'💲 Сумма перевода: {sums} USDT\n'
-                              f'✅ После оплаты нажмите: Я оплатил',
-                         reply_markup=menu.btc)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'🧾 Счёт на оплату создан\n'
+                                  f'💵 Произведите перевод на адрес:\n'
+                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'💲 Сумма перевода: {sums} USDT\n'
+                                  f'✅ После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def usdc(message):
-        response = requests.get(url='https://yobit.net/api/3/ticker/usdc_rur').json()
-        btc_rur = response.get('usdc_rur')
-        cost = btc_rur.get('sell')
-        sums = float(message.text) / float(cost)
-        sums = float("%.7f" % sums)
-        replenishment_dict[message.chat.id] = func.replenishment("USDC", message.from_user.username, message.text,
-                                                                 sums, message.from_user.id)
+        try:
+            response = requests.get(url='https://yobit.net/api/3/ticker/usdc_rur').json()
+            btc_rur = response.get('usdc_rur')
+            cost = btc_rur.get('sell')
+            sums = float(message.text) / float(cost)
+            sums = float("%.7f" % sums)
+            replenishment_dict[message.chat.id] = func.replenishment("USDC", message.from_user.username, message.text,
+                                                                     sums, message.from_user.id)
 
-        temp = replenishment_dict[message.chat.id]
-        func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
-                        message.from_user.id)
+            temp = replenishment_dict[message.chat.id]
+            func.create_pay(message.from_user.username, message.text, temp.valute, temp.code, sums, message.chat.id,
+                            message.from_user.id)
 
-        bot.send_message(chat_id=message.chat.id,
-                         text=f'🧾 Счёт на оплату создан\n'
-                              f'💵 Произведите перевод на адрес:\n'
-                              f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
-                              f'💲 Сумма перевода: {sums} USDC\n'
-                              f'✅ После оплаты нажмите: Я оплатил',
-                         reply_markup=menu.btc)
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'🧾 Счёт на оплату создан\n'
+                                  f'💵 Произведите перевод на адрес:\n'
+                                  f'⚠️ bc1qexryydr38chd0rwpk3xexxeed0g0pmufa0tg5l\n'
+                                  f'💲 Сумма перевода: {sums} USDC\n'
+                                  f'✅ После оплаты нажмите: Я оплатил',
+                             reply_markup=menu.btc)
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def dash(message):
         try:
@@ -1112,44 +1144,59 @@ def start_bot():
                                   f'💲 Сумма перевода: {sums} DASH\n'
                                   f'✅ После оплаты нажмите: Я оплатил',
                              reply_markup=menu.btc)
-        except:
-            pass
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def ok_pay(message):
-        row = func.ok_pays(message.text)
-        for i in row:
-            btn_ok = types.InlineKeyboardMarkup(row_width=3)
-            btn_ok.add(
-                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
-                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
-            )
+        try:
+            row = func.ok_pays(message.text)
+            for i in row:
+                btn_ok = types.InlineKeyboardMarkup(row_width=3)
+                btn_ok.add(
+                    types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
+                    types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
+                )
+                bot.send_message(chat_id=message.chat.id,
+                                 text=f'Уникальный код платежа: {i[4]}\n'
+                                      f'Username: {i[0]}\n'
+                                      f'Сумма: {i[1]}\n'
+                                      f'Тип криптовалюты: {i[3]}\n'
+                                      f'Количество валюты: {i[5]}\n',
+                                 reply_markup=btn_ok,
+                                 )
+                ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
+        except Exception as e:
             bot.send_message(chat_id=message.chat.id,
-                             text=f'Уникальный код платежа: {i[4]}\n'
-                                  f'Username: {i[0]}\n'
-                                  f'Сумма: {i[1]}\n'
-                                  f'Тип криптовалюты: {i[3]}\n'
-                                  f'Количество валюты: {i[5]}\n',
-                             reply_markup=btn_ok,
-                             )
-            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     def ok_pay2(message):
-        row = func.ok_pays2(message.text)
-        for i in row:
-            btn_ok = types.InlineKeyboardMarkup(row_width=3)
-            btn_ok.add(
-                types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
-                types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
-            )
+        try:
+            row = func.ok_pays2(message.text)
+            for i in row:
+                btn_ok = types.InlineKeyboardMarkup(row_width=3)
+                btn_ok.add(
+                    types.InlineKeyboardButton(text='✅Подтвердить', callback_data=int(i[4])),
+                    types.InlineKeyboardButton(text='❌ Отменить', callback_data=int(i[4] + 1000))
+                )
+                bot.send_message(chat_id=message.chat.id,
+                                 text=f'Уникальный код платежа: {i[4]}\n'
+                                      f'Username: {i[0]}\n'
+                                      f'Сумма: {i[1]}\n'
+                                      f'Тип криптовалюты: {i[3]}\n'
+                                      f'Количество валюты: {i[5]}\n',
+                                 reply_markup=btn_ok,
+                                 )
+                ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
+        except Exception as e:
             bot.send_message(chat_id=message.chat.id,
-                             text=f'Уникальный код платежа: {i[4]}\n'
-                                  f'Username: {i[0]}\n'
-                                  f'Сумма: {i[1]}\n'
-                                  f'Тип криптовалюты: {i[3]}\n'
-                                  f'Количество валюты: {i[5]}\n',
-                             reply_markup=btn_ok,
-                             )
-            ok_pay_dict[int(i[4])] = func.ok(i[4], i[7], i[0], i[1], i[8])
+                             text=f'⚠️ Что-то пошло не по плану\n'
+                                  f'Возможно введенные данные не корректны',
+                             reply_markup=menu.main_menu)
 
     @bot.message_handler(content_types=['document'])
     def download_product_4(message):
