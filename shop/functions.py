@@ -319,7 +319,7 @@ def admin_info():
 
         row = cursor.fetchone()
 
-    msg = '❕ Информаци:\n\n' \
+    msg = '❕ Информация:\n\n' \
           f'❕ За все время - {amount_user_all}\n' \
           f'❕ За день - {amount_user_day}\n' \
           f'❕ За час - {amount_user_hour}'
