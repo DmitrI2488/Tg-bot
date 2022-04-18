@@ -11,6 +11,7 @@ import time
 import datetime
 import random
 import requests
+import payment as pay
 
 catalog_dict = {}
 product_dict = {}
@@ -19,6 +20,7 @@ balance_dict = {}
 admin_sending_messages_dict = {}
 replenishment_dict = {}
 ok_pay_dict = {}
+check_dict = {}
 
 
 def start_bot():
@@ -199,20 +201,10 @@ def start_bot():
         if call.data == 'no_crypto':
             bot.edit_message_text(chat_id=chat_id,
                                   message_id=message_id,
-                                  text=f'❗ Вам необходимо приобрести криптовалюту через @CryptoBot\n'
-                                       f'Обратите внимание, что у нас есть поддержка следующих криптовалют\n'
-                                       f'💰 Bitcoin|BTC\n'
-                                       f'💰 Monero|XMR\n'
-                                       f'💰 Binance coin|BNB\n'
-                                       f'💰 Binance USD|BUSD\n'
-                                       f'💰 USD Coin|USDC\n'
-                                       f'💰 Tether|USDT\n'
-                                       f'✅ После приобретения криптовалюты вернитесь в раздел: У меня есть криптовалюта\n'
-                                       f'Выберите нужную вам криптовалюту и произведите перевод\n'
-                                       f'💵 После подтвержения платежа, деньги будут зачислены на ваш счет\n'
-                                       f'❗❗❗ Обратите внимание, что при переводе денег,'
-                                       f'не стоит закрывать окно с суммой перевода, так как она автоматически меняется'
-                                       f'в зависимости от курса на бирже ❗❗❗',
+                                  text=f'❗ Если у вас нет криптовалюты, всопльзуйтесь методом оплаты Cryptobot\n'
+                                       f'💰Там вы сможете приобрести валюту и оплатить ей наши услуги\n'
+                                       f'💵Если у вас есть криптовалюта, воспользуйтесь прямым переводом\n'
+                                       f'@CryptoBot\n',
                                   reply_markup=menu.i_buy_cr,
 
                                   )
@@ -514,6 +506,229 @@ def start_bot():
                     text='Платеж отменен',
                 )
 
+        if call.data == 'variants':
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text='💰 Выберите способ оплаты',
+                                  reply_markup=menu.variant,  
+            )
+
+        if call.data == 'crypt':
+            msg = bot.edit_message_text(chat_id=chat_id,
+                                        message_id=message_id,
+                                  text = 'Укажите какую сумму хотите пополнить в рублях',  
+            )
+            bot.register_next_step_handler(msg, sum_bot)
+
+        if call.data == 'BTC_B2':
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text = f'Если вы подтвердити платеж, то нажмите кнопку прверить платеж',
+                                  reply_markup=menu.check_payb,  
+            )
+
+        if call.data == 'BTC_B21':
+            pay_create = types.InlineKeyboardMarkup(row_width=1)
+            url = check_dict[chat_id+1]
+            pay_create.add(
+                types.InlineKeyboardButton(text='💰 Оплатить счет', url=url),
+                types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay2'),
+                types.InlineKeyboardButton(text='❌ Отменить платеж и вернуться назад', callback_data='variants'),
+            )
+
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text = f'💰 Счёт на оплату сформирован',
+                                  reply_markup=pay_create,  
+            )
+
+        if call.data == 'USDT_B21':
+            pay_create = types.InlineKeyboardMarkup(row_width=1)
+            url = check_dict[chat_id+3]
+            pay_create.add(
+                types.InlineKeyboardButton(text='💰 Оплатить счет', url=url),
+                types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay3'),
+                types.InlineKeyboardButton(text='❌ Отменить платеж и вернуться назад', callback_data='variants'),
+            )
+
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text = f'💰 Счёт на оплату сформирован',
+                                  reply_markup=pay_create,  
+            )
+
+        if call.data == 'BNB_B21':
+            pay_create = types.InlineKeyboardMarkup(row_width=1)
+            url = check_dict[chat_id+5]
+            pay_create.add(
+                types.InlineKeyboardButton(text='💰 Оплатить счет', url=url),
+                types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay4'),
+                types.InlineKeyboardButton(text='❌ Отменить платеж и вернуться назад', callback_data='variants'),
+            )
+
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text = f'💰 Счёт на оплату сформирован',
+                                  reply_markup=pay_create,  
+            )
+
+        if call.data == 'TON_21':
+            pay_create = types.InlineKeyboardMarkup(row_width=1)
+            url = check_dict[chat_id+7]
+            pay_create.add(
+                types.InlineKeyboardButton(text='💰 Оплатить счет', url=url),
+                types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay5'),
+                types.InlineKeyboardButton(text='❌ Отменить платеж и вернуться назад', callback_data='variants'),
+            )
+
+            bot.edit_message_text(chat_id=chat_id,
+                                  message_id=message_id,
+                                  text = f'💰 Счёт на оплату сформирован',
+                                  reply_markup=pay_create,  
+            )
+
+        if call.data == 'ipay2':
+            j = pay.CryptoPay(chat_id, parameters = {
+            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+                "api_url": "https://testnet-pay.crypt.bot/"
+            })
+            url = check_dict[chat_id+1]
+            s = check_dict[chat_id+2]
+            t = j.get_invoice(s)
+            status = t[0].get('status')
+            if status == 'active':
+                check_payb = types.InlineKeyboardMarkup(row_width=1)
+                check_payb.add(
+                    types.InlineKeyboardButton(text='💰 Оплатить счёт',url=url),
+                    types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay2'),
+                    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
+                )
+
+                bot.delete_message(chat_id=chat_id,
+                                      message_id=message_id,
+                )
+                bot.send_message(chat_id=chat_id,
+                                 text = f'❌ Ваш платеж не оплачен, проверьте данные',
+                                 reply_markup=check_payb,   
+                )
+            else:
+                try:
+                    func.auto_repl(chat_id, check_dict[chat_id])
+                    bot.edit_message_text(chat_id=chat_id,
+                                        message_id=message_id,
+                                        text = f'✅ Спасибо, ваш платеж зачислен!',
+                                        reply_markup=menu.main_menu,  
+                    )
+                except:
+                    pass
+
+        if call.data == 'ipay3':
+            j = pay.CryptoPay(chat_id, parameters = {
+            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+                "api_url": "https://testnet-pay.crypt.bot/"
+            })
+            s = check_dict[chat_id+4]
+            t = j.get_invoice(s)
+            url = check_dict[chat_id+3]
+            status = t[0].get('status')
+            if status == 'active':
+                check_payb = types.InlineKeyboardMarkup(row_width=1)
+                check_payb.add(
+                    types.InlineKeyboardButton(text='💰 Оплатить счёт',url=url),
+                    types.InlineKeyboardButton(text='✅ Я оплатил', callback_data='ipay3'),
+                    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
+                )
+
+                bot.delete_message(chat_id=chat_id,
+                                      message_id=message_id,
+                )
+                bot.send_message(chat_id=chat_id,
+                                 text = f'❌ Ваш платеж не оплачен, проверьте данные',
+                                 reply_markup=check_payb,   
+                )
+            else:
+                try:
+                    func.auto_repl(chat_id, check_dict[chat_id])
+                    bot.edit_message_text(chat_id=chat_id,
+                                        message_id=message_id,
+                                        text = f'✅ Спасибо, ваш платеж зачислен!',
+                                        reply_markup=menu.main_menu,  
+                    )
+                except:
+                    pass
+
+        if call.data == 'ipay4':
+            j = pay.CryptoPay(chat_id, parameters = {
+            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+                "api_url": "https://testnet-pay.crypt.bot/"
+            })
+            s = check_dict[chat_id+6]
+            t = j.get_invoice(s)
+            status = t[0].get('status')
+            url = check_dict[chat_id+5]
+            if status == 'active':
+                check_payb = types.InlineKeyboardMarkup(row_width=1)
+                check_payb.add(
+                    types.InlineKeyboardButton(text='💰 Оплатить счёт',url=url),
+                    types.InlineKeyboardButton(text='✅Я оплатил', callback_data='ipay4'),
+                    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
+                )
+
+                bot.delete_message(chat_id=chat_id,
+                                      message_id=message_id,
+                )
+                bot.send_message(chat_id=chat_id,
+                                 text = f'❌ Ваш платеж не оплачен, проверьте данные',
+                                 reply_markup=check_payb,   
+                )
+            else:
+                try:
+                    func.auto_repl(chat_id, check_dict[chat_id])
+                    bot.edit_message_text(chat_id=chat_id,
+                                        message_id=message_id,
+                                        text = f'✅ Спасибо, ваш платеж зачислен!',
+                                        reply_markup=menu.main_menu,  
+                    )
+                except:
+                    pass
+
+        if call.data == 'ipay5':
+            j = pay.CryptoPay(chat_id, parameters = {
+            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+                "api_url": "https://testnet-pay.crypt.bot/"
+            })
+            s = check_dict[chat_id]
+            url = check_dict[chat_id+7]
+            print(s)
+            t = j.get_invoice(s)
+            status = t[0].get('status')
+            if status == 'active':
+                check_payb = types.InlineKeyboardMarkup(row_width=1)
+                check_payb.add(
+                    types.InlineKeyboardButton(text='💰 Оплатить счёт',url=url),
+                    types.InlineKeyboardButton(text='✅Я оплатил', callback_data='ipay5'),
+                    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
+                )
+
+                bot.delete_message(chat_id=chat_id,
+                                      message_id=message_id,
+                )
+                bot.send_message(chat_id=chat_id,
+                                 text = f'❌ Ваш платеж не оплачен, проверьте данные',
+                                 reply_markup=check_payb,   
+                )
+            else:
+                try:
+                    func.auto_repl(chat_id, check_dict[chat_id])
+                    bot.edit_message_text(chat_id=chat_id,
+                                        message_id=message_id,
+                                        text = f'✅ Спасибо, ваш платеж зачислен!',
+                                        reply_markup=menu.main_menu,  
+                    )
+                except:
+                    pass
+
+
     def give_balance(message):
         try:
             balance = func.GiveBalance(message.text)
@@ -612,8 +827,13 @@ def start_bot():
                                          reply_markup=menu.main_menu)
 
                 if check == 0:
+                    replis = types.InlineKeyboardMarkup(row_width=1)
+                    replis.add(
+                        types.InlineKeyboardButton(text='💰 Пополнить баланс', callback_data='replenishment'),
+                    )
                     bot.send_message(chat_id=message.chat.id,
-                                     text='❌ На балансе недостаточно средств')
+                                     text='❌ На балансе недостаточно средств',
+                                     reply_markup=replis)
 
             else:
                 bot.send_message(chat_id=message.chat.id,
@@ -998,8 +1218,15 @@ def start_bot():
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ Временно отсутствует\n'
                                   f'💲 Сумма перевода: {sums} BTC\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
+                                  f'✅ После оплаты нажмите: Я оплатил\n'
+                                  f'👇 Адресс и сумма для удобного копирования',
                              reply_markup=menu.btc)
+            bot.send_message(chat_id=message.from_user.id,
+                             text = 'Временно отсутствует'
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                             text = sums
+            )  
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text=f'⚠️ Что-то пошло не по плану\n'
@@ -1030,8 +1257,15 @@ def start_bot():
                                   f'💵 Произведите перевод на адрес:\n'
                                   f'⚠️ 4B8QbrEc2fa61umDsRycJxC2gKVT79Yw4EQNUSAbt4RDdHGTHiN99UjBE4HuPWV2EScGmgBfJ29bWAWEVCynvduHALG5pmd\n'
                                   f'💲 Сумма перевода: {sums} XMR\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
+                                  f'✅ После оплаты нажмите: Я оплатил\n'
+                                  f'👇 Адрес и сумма для удобного копирования',
                              reply_markup=menu.btc)
+            bot.send_message(chat_id=message.from_user.id,
+                             text = '4B8QbrEc2fa61umDsRycJxC2gKVT79Yw4EQNUSAbt4RDdHGTHiN99UjBE4HuPWV2EScGmgBfJ29bWAWEVCynvduHALG5pmd'
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                             text = sums
+            )                   
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text=f'⚠️ Что-то пошло не по плану\n'
@@ -1061,8 +1295,15 @@ def start_bot():
                                   f'⚠ Поддерживаемые сети:\n'
                                   f'BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} BNB\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
+                                  f'✅ После оплаты нажмите: Я оплатил\n'
+                                  f'👇 Адрес и сумма для удобного копирования',
                              reply_markup=menu.btc)
+            bot.send_message(chat_id=message.from_user.id,
+                             text = '0xC3878fe1796210054191448FCF7F4E53710CdD1f'
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                             text = sums
+            )     
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text=f'⚠️ Что-то пошло не по плану\n'
@@ -1090,8 +1331,15 @@ def start_bot():
                                   f'⚠ Поддерживаемые сети:\n'
                                   f' BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} USDT\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
+                                  f'✅ После оплаты нажмите: Я оплатил\n'
+                                  f'👇 Адрес и сумма для удобного копирования',
                              reply_markup=menu.btc)
+            bot.send_message(chat_id=message.from_user.id,
+                             text = '0xC3878fe1796210054191448FCF7F4E53710CdD1f'
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                             text = sums
+            )                    
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text=f'⚠️ Что-то пошло не по плану\n'
@@ -1119,8 +1367,15 @@ def start_bot():
                                   f'⚠ Поддерживаемые сети:\n'
                                   f'BSC, Polygon Mainnet,  Ethereum Mainnet\n'
                                   f'💲 Сумма перевода: {sums} USDC\n'
-                                  f'✅ После оплаты нажмите: Я оплатил',
+                                  f'✅ После оплаты нажмите: Я оплатил\n'
+                                  f'👇 Адрес и сумма для удобного копирования',
                              reply_markup=menu.btc)
+            bot.send_message(chat_id=message.from_user.id,
+                             text = '0xC3878fe1796210054191448FCF7F4E53710CdD1f'
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                             text = sums
+            )                   
         except Exception as e:
             bot.send_message(chat_id=message.chat.id,
                              text=f'⚠️ Что-то пошло не по плану\n'
@@ -1205,6 +1460,60 @@ def start_bot():
                              text=f'⚠️ Что-то пошло не по плану\n'
                                   f'Возможно введенные данные не корректны',
                              reply_markup=menu.main_menu)
+
+    def sum_bot(message):
+        try:
+            j = pay.CryptoPay(message.from_user.id, parameters = {
+            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+                "api_url": "https://testnet-pay.crypt.bot/"
+            })
+            # Оплата биткоином
+            invo = j.create_invoice(float(message.text) / float(j.get_exchange_rates('BTC')[0].get('rate')), 'BTC')
+            s = invo.get('result')
+            code = s.get('invoice_id')
+            check_dict[message.from_user.id+2] = code
+            url1 = s.get('pay_url')
+            check_dict[message.from_user.id+1] = url1
+            # Оплата Тетером
+            invo = j.create_invoice(float(message.text) / float(j.get_exchange_rates('USDT')[0].get('rate')), 'USDT')
+            s = invo.get('result')
+            code = s.get('invoice_id')
+            check_dict[message.from_user.id+4] = code
+            url2 = s.get('pay_url')
+            check_dict[message.from_user.id+3] = url2
+            # Оплата BNB
+            invo = j.create_invoice(float(message.text) / float(j.get_exchange_rates('BNB')[0].get('rate')), 'BNB')
+            s = invo.get('result')
+            code = s.get('invoice_id')
+            check_dict[message.from_user.id+6] = code
+            url3 = s.get('pay_url')
+            check_dict[message.from_user.id+5] = url3
+            # Оплата TON
+            # invo = j.create_invoice(float(message.text) / float(j.get_exchange_rates('TON')[0].get('rate')), 'TON')
+            # s = invo.get('result')
+            # code = s.get('invoice_id')
+            # check_dict[message.from_user.id+8] = code
+            # url4 = s.get('pay_url')
+            # check_dict[message.from_user.id+7] = url4
+            # Клавиатура
+            check_dict[message.from_user.id] = float(message.text)
+            variants_pay = types.InlineKeyboardMarkup(row_width=1)
+            
+            variants_pay.add(
+                types.InlineKeyboardButton(text='💰 BTC', callback_data='BTC_B21'),
+                types.InlineKeyboardButton(text='💰 Tether (USDT)', callback_data='USDT_B21'),
+                types.InlineKeyboardButton(text='💰 BNB', callback_data='BNB_B21'),
+                types.InlineKeyboardButton(text='👈 Назад', callback_data='variants'),
+            )
+            bot.send_message(chat_id=message.from_user.id,
+                                  text='Выберите валюту',
+                                  reply_markup=variants_pay,  
+            )
+        except:
+                bot.send_message(chat_id=message.chat.id,
+                                 text=f'⚠️ Что-то пошло не по плану\n'
+                                 f'Возможно введенные данные не корректны',
+                                 reply_markup=menu.main_menu)
 
     @bot.message_handler(content_types=['document'])
     def download_product_4(message):

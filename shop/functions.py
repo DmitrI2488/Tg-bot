@@ -604,3 +604,15 @@ def check_id(username):
     user = cursor.fetchmany()
 
     return user
+
+
+def auto_repl(user_id, sum):
+    conn = sqlite3.connect('base_ts.sqlite')
+    cursor = conn.cursor()
+    try:
+        balance = cursor.execute(f'SELECT balance FROM users WHERE user_id = "{user_id}"').fetchone()
+        balance = float(balance[0]) + float(sum)
+        cursor.execute(f'UPDATE users SET balance = {balance} WHERE user_id = "{user_id}"')
+        conn.commit()
+    except:
+        pass

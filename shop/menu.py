@@ -10,9 +10,9 @@ main_menu.add(
     types.InlineKeyboardButton(text='🛒 Мои покупки', callback_data='purchases'),
     types.InlineKeyboardButton(text='💸 Пополнить баланс', callback_data='replenishment'),
 )
-# main_menu.add(
-#     types.InlineKeyboardButton(text='👥 Реферальная сеть', callback_data='referral_web'),
-# )
+main_menu.add(
+        types.InlineKeyboardButton(text='💬 Связь с нами', url='https://t.me/IgBotSupport'),
+)
 
 i_buy_cr = types.InlineKeyboardMarkup(row_width=1)
 i_buy_cr.add(
@@ -33,12 +33,12 @@ crypto.add(
     types.InlineKeyboardButton(text='💰 Binance coin|BNB', callback_data='BNB'),
     types.InlineKeyboardButton(text='💰 USD Coin|USDC', callback_data='USDC'),
     types.InlineKeyboardButton(text='💰 Tether|USDT', callback_data='USDT'),
-    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment2'),
+    types.InlineKeyboardButton(text='👈 Назад', callback_data='variants'),
 )
 
 replenishments = types.InlineKeyboardMarkup(row_width=1)
 replenishments.add(
-    types.InlineKeyboardButton(text='✅ У меня есть криптовалюта', callback_data='crypto'),
+    types.InlineKeyboardButton(text='✅ Методы пополнения (Криптовалюта)', callback_data='variants'),
     types.InlineKeyboardButton(text='❌ У меня нет криптовалюты', callback_data='no_crypto'),
     types.InlineKeyboardButton(text='👈 Назад', callback_data='main'),
 )
@@ -128,6 +128,30 @@ met_ch = types.InlineKeyboardMarkup(row_width=1)
 met_ch.add(
     types.InlineKeyboardButton(text='Проверить через @username', callback_data='u_name'),
     types.InlineKeyboardButton(text='Проверить через user_id', callback_data='u_id'),
+)
+
+
+variant = types.InlineKeyboardMarkup(row_width=1)
+variant.add(
+    types.InlineKeyboardButton(text='Прямой перевод', callback_data='crypto'),
+    types.InlineKeyboardButton(text='CryptoBot (Возможно приобрести валюту)', callback_data='crypt'),
+    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
+)
+
+variants_pay = types.InlineKeyboardMarkup(row_width=3)
+variants_pay.add(
+    types.InlineKeyboardButton(text='BTC', callback_data='BTC_B'),
+    types.InlineKeyboardButton(text='TON', callback_data='TON_B'),
+    types.InlineKeyboardButton(text='BNB', callback_data='BNB_B'),
+    types.InlineKeyboardButton(text='Tether', callback_data='Theter_B'),
+    types.InlineKeyboardButton(text='USDC', callback_data='UCDC_B'),
+    types.InlineKeyboardButton(text='USDT', callback_data='UCDT_B'),
+)
+
+check_payb = types.InlineKeyboardMarkup(row_width=1)
+check_payb.add(
+    types.InlineKeyboardButton(text='Я оплатил', callback_data='ipay2'),
+    types.InlineKeyboardButton(text='👈 Назад', callback_data='replenishment'),
 )
 
 
