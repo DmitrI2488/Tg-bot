@@ -215,28 +215,32 @@ def start_bot():
                                   reply_markup=menu.main_menu)
 
         if call.data == 'BTC':
-            msg = bot.send_message(chat_id=chat_id,
-                                   text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
+            msg = bot.edit_message_text(message_id=message_id,
+                                        chat_id=chat_id,
+                                        text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, btc)
 
         if call.data == 'XMR':
-            msg = bot.send_message(chat_id=chat_id,
-                                   text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
+            msg = bot.edit_message_text(message_id=message_id,
+                                        chat_id=chat_id,
+                                        text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, xmr)
 
         if call.data == 'BNB':
-            msg = bot.send_message(chat_id=chat_id,
-                                   text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
+            msg = bot.edit_message_text(chat_id=chat_id,
+                                        text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, bnb)
 
         if call.data == 'USDC':
-            msg = bot.send_message(chat_id=chat_id,
+            msg = bot.send_message(message_id=message_id,
+                                   chat_id=chat_id,
                                    text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, usdc)
 
         if call.data == 'USDT':
-            msg = bot.send_message(chat_id=chat_id,
-                                   text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
+            msg = bot.edit_message_text(message_id=message_id,
+                                        chat_id=chat_id,
+                                        text=f'₽ Укажите какую сумму в рублях, хотите пополнить')
             bot.register_next_step_handler(msg, usdt)
 
         # if call.data == 'DASH':
