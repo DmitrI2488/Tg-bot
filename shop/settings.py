@@ -1,13 +1,13 @@
 
 # Token telegran bot
-bot_token = '5105029669:AAHbWBto8_8TTn0qS88LpdGoHtwBGEFZb-c' # токен бота
-CHANNEL_ID = -1001730199466 # id канала куда будет отсылаться информация, ид без -100 в начале (например: 124873248) - указать заместо нуля
-CHANNEL_ID2 = -1001646174698
+bot_token = '5269409170:AAEJ7JuoL3JZr35oMJxgCO0WGKqLaD6vTI8' # токен бота
+CHANNEL_ID = -1001617703199 # id канала куда будет отсылаться информация, ид без -100 в начале (например: 124873248) - указать заместо нуля
+CHANNEL_ID2 =  -1001789801850
 
 # ID admin
 admin_id = 396595993 # id админа - указать заместо нуля
 
-bot_login = 'botik988bot' # логин бота
+bot_login = 'igcapitalbot' # логин бота
 ref_percent = 5 # Процент реферальной системы
 
 QIWI_NUMBER = '+77777777777'    # номер киви

@@ -589,8 +589,8 @@ def start_bot():
 
         if call.data == 'ipay2':
             j = pay.CryptoPay(chat_id, parameters = {
-            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-                "api_url": "https://testnet-pay.crypt.bot/"
+            "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+                "api_url": "https://pay.crypt.bot/"
             })
             url = check_dict[chat_id+1]
             s = check_dict[chat_id+2]
@@ -624,8 +624,8 @@ def start_bot():
 
         if call.data == 'ipay3':
             j = pay.CryptoPay(chat_id, parameters = {
-            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-                "api_url": "https://testnet-pay.crypt.bot/"
+            "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+                "api_url": "https://pay.crypt.bot/"
             })
             s = check_dict[chat_id+4]
             t = j.get_invoice(s)
@@ -659,7 +659,7 @@ def start_bot():
 
         if call.data == 'ipay4':
             j = pay.CryptoPay(chat_id, parameters = {
-            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
+            "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
                 "api_url": "https://testnet-pay.crypt.bot/"
             })
             s = check_dict[chat_id+6]
@@ -694,8 +694,8 @@ def start_bot():
 
         if call.data == 'ipay5':
             j = pay.CryptoPay(chat_id, parameters = {
-            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-                "api_url": "https://testnet-pay.crypt.bot/"
+            "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+                "api_url": "https://pay.crypt.bot/"
             })
             s = check_dict[chat_id]
             url = check_dict[chat_id+7]
@@ -1216,13 +1216,13 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text=f'🧾 Счёт на оплату создан\n'
                                   f'💵 Произведите перевод на адрес:\n'
-                                  f'⚠️ Временно отсутствует\n'
+                                  f'⚠️ 3LbQMAfGc2FQjrQyvfXuHwcNaP3fgQrfBR\n'
                                   f'💲 Сумма перевода: {sums} BTC\n'
                                   f'✅ После оплаты нажмите: Я оплатил\n'
                                   f'👇 Адресс и сумма для удобного копирования',
                              reply_markup=menu.btc)
             bot.send_message(chat_id=message.from_user.id,
-                             text = 'Временно отсутствует'
+                             text = '3LbQMAfGc2FQjrQyvfXuHwcNaP3fgQrfBR'
             )
             bot.send_message(chat_id=message.from_user.id,
                              text = sums
@@ -1464,8 +1464,8 @@ def start_bot():
     def sum_bot(message):
         try:
             j = pay.CryptoPay(message.from_user.id, parameters = {
-            "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-                "api_url": "https://testnet-pay.crypt.bot/"
+            "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+                "api_url": "https://pay.crypt.bot/"
             })
             # Оплата биткоином
             invo = j.create_invoice(float(message.text) / float(j.get_exchange_rates('BTC')[0].get('rate')), 'BTC')

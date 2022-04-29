@@ -2,8 +2,8 @@ import requests
 
 user_id = '123123'
 parameters = {
-    "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-    "api_url": "https://testnet-pay.crypt.bot/"
+    "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+    "api_url": "https://pay.crypt.bot/"
 }
 
 
@@ -12,8 +12,8 @@ parameters = {
 class CryptoPay(object):
     user_id = '123123'
     parameters = {
-        "token": "4644:AACHMxoL1AIG5V9HSu8oU4CViaEvedv1alV",
-        "api_url": "https://testnet-pay.crypt.bot/"
+        "token": "39708:AAB4zl9Uvd9k1ksq5LbCDz85LORVMmEKpVs",
+        "api_url": "https://pay.crypt.bot/"
     }
 
     def __init__(self, user_id, parameters) -> None:
