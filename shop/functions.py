@@ -118,16 +118,12 @@ def menu_section(name_section):
 def menu_product(product, dict):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
-    print(product)
     row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
     section = row[1]
     info = row[3]
-    print(section)
     row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
-    print(row)
     dict.section = section
     dict.product = product
-    print(row[2])
     dict.price = row[2]
     dict.name = row[3]
 
