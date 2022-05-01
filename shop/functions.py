@@ -118,23 +118,23 @@ def menu_section(name_section):
 def menu_product(product, dict):
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
-
+    print(product)
     row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
     section = row[1]
     info = row[3]
-
-    cursor.execute(f'SELECT * FROM "{section}" WHERE code = "{product}"')
-    row = cursor.fetchone()
-
+    print(section)
+    row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
+    print(row)
     dict.section = section
     dict.product = product
-    dict.price = row[1]
+    print(row[2])
+    dict.price = row[2]
     dict.name = row[3]
 
     text = settings.text_purchase.format(
         name=row[0],
         info=info,
-        price=row[1],
+        price=row[2],
     )
 
     return text, dict
@@ -242,9 +242,9 @@ def del_product_to_section(name_product, section):
 
     # del
     product = cursor.execute(f'SELECT * FROM "{section}" WHERE list = "{name_product}"').fetchone()
-    cursor.execute(f"DELETE FROM '{section}' WHERE list = '{name_product}'")
+
+    cursor.execute(f"DELETE FROM '{section}' WHERE name = '{name_product}'")
     conn.commit()
-    cursor.execute(f"DROP TABLE '{product[2]}'")
 
     # Close connection
     cursor.close()
