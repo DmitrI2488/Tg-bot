@@ -151,7 +151,7 @@ def add_section_to_catalog(name_section):
     conn.commit()
 
     # Create table section
-    conn.execute(f"CREATE TABLE '{code}' (list text, price text, code text)")
+    conn.execute(f"CREATE TABLE '{code}' (name text, list text, price text, code text)")
 
     # Close connection
     cursor.close()
