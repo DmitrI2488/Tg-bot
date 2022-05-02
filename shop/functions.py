@@ -120,17 +120,18 @@ def menu_product(product, dict):
     cursor = conn.cursor()
     row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
     section = row[1]
+    code = row[2]
     info = row[3]
-    row = cursor.execute(f'SELECT * FROM section WHERE code = "{product}"').fetchone()
+    row = cursor.execute(f'SELECT * FROM "{section}" WHERE price = "{code}"').fetchone()
     dict.section = section
     dict.product = product
-    dict.price = row[2]
-    dict.name = row[3]
+    dict.price = row[1]
+    dict.name = row[0]
 
     text = settings.text_purchase.format(
         name=row[0],
         info=info,
-        price=row[2],
+        price=row[1],
     )
 
     return text, dict
