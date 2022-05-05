@@ -1540,7 +1540,7 @@ def start_bot():
             bot.send_message(chat_id=message.chat.id,
                              text='Упсс, что-то пошло не по плану')
 
-    bot.polling(none_stop=True)
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)
 
 
 start_bot()
