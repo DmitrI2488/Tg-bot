@@ -138,13 +138,13 @@ def menu_product(product, dict):
 
 
 #   Admin menu - add_to_section_to_catalog
-def add_section_to_catalog(name_section):
+def add_section_to_catalog(name_section, descr):
     # Connection
     conn = sqlite3.connect("base_ts.sqlite")
     cursor = conn.cursor()
     code = random.randint(11111, 99999)
     # Add
-    cursor.execute(f"INSERT INTO catalog VALUES ('{name_section}', '{code}')")
+    cursor.execute(f"INSERT INTO catalog VALUES ('{name_section}', '{code}', '{descr}')")
     conn.commit()
 
     # Create table section
@@ -470,6 +470,14 @@ def list_product():
 
     return list_product
 
+
+def descr_prod(name):
+    conn = sqlite3.connect("base_ts.sqlite")
+    cursor = conn.cursor()
+    row = cursor.execute(f'SELECT description FROM catalog WHERE code = "{name}"').fetchone()
+
+
+    return row
 
 def check_ref_code(user_id):
     conn = sqlite3.connect("base_ts.sqlite")
