@@ -21,6 +21,8 @@ admin_sending_messages_dict = {}
 replenishment_dict = {}
 ok_pay_dict = {}
 check_dict = {}
+sect_dict = {}
+des_name = {}
 
 
 def start_bot():
@@ -71,11 +73,11 @@ def start_bot():
             product = func.Product(chat_id)
             product_dict[call.message.chat.id] = product
             product.section = name
-
+            des = func.descr_prod(call.data)
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=f'❕ Выберите нужный товар',
+                text=des,
                 reply_markup=func.menu_section(call.data)
             )
 
@@ -780,9 +782,20 @@ def start_bot():
 
     def create_section(message):
         try:
+            print(1)
+            sect_dict[1] = message.text
+            msg = bot.send_message(chat_id=message.chat.id,
+                                   text='Введите описание')
+            bot.register_next_step_handler(msg, create_section_3)
+        except Exception as e:
+            bot.send_message(chat_id=message.chat.id,
+                             text='⚠️ Что-то пошло не по плану',
+                             reply_markup=menu.main_menu)
+
+    def create_section_3(message):
+        try:
+            des_name[1] = message.text
             name = message.text
-            catalog = func.Catalog(name)
-            catalog_dict[message.chat.id] = catalog
             markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
             markup.add('Yes', 'No')
             msg = bot.send_message(chat_id=message.chat.id,
@@ -851,11 +864,13 @@ def start_bot():
     def create_section_2(message):
         try:
             if message.text == 'Yes':
-                catalog = catalog_dict[message.chat.id]
-                func.add_section_to_catalog(catalog.name)
+                # catalog = catalog_dict[message.chat.id]
+                sect = sect_dict[1]
+                desc = des_name[1]
+                func.add_section_to_catalog(sect, desc)
                 bot.send_message(
                     chat_id=message.chat.id,
-                    text=f'✅Раздел: {catalog.name}\n'
+                    text=f'✅Раздел: {sect}\n'
                          f'✅Успешно добавлен в каталог',
                     reply_markup=menu.admin_menu
                 )
